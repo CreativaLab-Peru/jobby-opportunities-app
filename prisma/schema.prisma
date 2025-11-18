@@ -1,0 +1,86 @@
+// -----------------------------------------------------
+// MongoDB Datasource
+// -----------------------------------------------------
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -----------------------------------------------------
+// Embedded Type: SalaryRange
+// -----------------------------------------------------
+type SalaryRange {
+  min Float?
+  max Float?
+}
+
+// -----------------------------------------------------
+// Tag — master dictionary for semantic search
+// -----------------------------------------------------
+model Tag {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String   @unique
+  synonyms   String[]
+  category   String?
+  createdAt  DateTime @default(now())
+}
+
+// -----------------------------------------------------
+// Opportunity — main resource
+// -----------------------------------------------------
+model Opportunity {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  type         String
+  title        String
+  organization String
+  url          String?
+
+  // ---- Eligibility ----
+  eligibleLevels    String[]
+  eligibleCountries String[]
+  minAge            Int?
+  maxAge            Int?
+
+  // ---- Tagging ----
+  tags            String[]
+  requiredSkills  String[]
+  optionalSkills  String[]
+  normalizedTags  String[]
+
+  // ---- Academic / Job ----
+  fieldOfStudy    String?
+  modality        String?
+  language        String?
+  fundingAmount   Float?
+  currency        String?
+
+  salaryRange     SalaryRange?  // embedded, no relations!
+
+  // ---- Dates ----
+  deadline     DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // ---- Scoring ----
+  popularityScore Int @default(0)
+}
+
+// -----------------------------------------------------
+// OpportunityCache — per-user match caching
+// -----------------------------------------------------
+model OpportunityCache {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId         String
+  opportunityId  String
+  score          Int
+  tagsMatched    String[]
+
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+}
