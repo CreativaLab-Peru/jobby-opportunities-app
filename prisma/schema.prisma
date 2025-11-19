@@ -40,6 +40,10 @@ model Opportunity {
   organization String
   url          String?
 
+  // Relación con el usuario que creó la oportunidad
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // ---- Eligibility ----
   eligibleLevels    String[]
   eligibleCountries String[]
@@ -83,4 +87,77 @@ model OpportunityCache {
 
   createdAt      DateTime @default(now())
   expiresAt      DateTime
+}
+
+// -----------------------------------------------------
+// User
+// -----------------------------------------------------
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+  
+  // Relaciones
+  opportunities Opportunity[]
+  sessions      Session[]
+  accounts      Account[]
+}
+
+// -----------------------------------------------------
+// Session - Requerido por Better Auth
+// -----------------------------------------------------
+model Session {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// -----------------------------------------------------
+// Account - Requerido por Better Auth (para OAuth)
+// -----------------------------------------------------
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  accountId         String
+  providerId        String
+  userId            String  @db.ObjectId
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken       String?
+  refreshToken      String?
+  idToken           String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("accounts")
+}
+
+// -----------------------------------------------------
+// Verification - Requerido por Better Auth
+// -----------------------------------------------------
+model Verification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
 }
