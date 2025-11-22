@@ -11,12 +11,9 @@ export interface OpportunityBase {
   url?: string;
   eligibleLevels: string[];
   eligibleCountries: string[];
-  minAge?: number;
-  maxAge?: number;
   tags: string[];
   requiredSkills: string[];
   optionalSkills: string[];
-  normalizedTags: string[];
   fieldOfStudy?: string;
   modality?: string;
   language?: string;
@@ -26,7 +23,6 @@ export interface OpportunityBase {
   deadline?: string;
 }
 
-// Para la base de datos (con campos auto-generados)
 export interface Opportunity extends OpportunityBase {
   id?: string;
   createdAt?: string;
@@ -34,10 +30,8 @@ export interface Opportunity extends OpportunityBase {
   popularityScore?: number;
 }
 
-// Para el formulario
 export type OpportunityFormData = OpportunityBase;
 
-// Para la lista (solo campos necesarios para mostrar)
 export interface OpportunityListItem {
   id: string;
   type: string;

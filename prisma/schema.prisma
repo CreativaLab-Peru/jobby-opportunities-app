@@ -47,14 +47,11 @@ model Opportunity {
   // ---- Eligibility ----
   eligibleLevels    String[]
   eligibleCountries String[]
-  minAge            Int?
-  maxAge            Int?
 
   // ---- Tagging ----
   tags            String[]
   requiredSkills  String[]
   optionalSkills  String[]
-  normalizedTags  String[]
 
   // ---- Academic / Job ----
   fieldOfStudy    String?
@@ -63,7 +60,7 @@ model Opportunity {
   fundingAmount   Float?
   currency        String?
 
-  salaryRange     SalaryRange?  // embedded, no relations!
+  salaryRange     SalaryRange?
 
   // ---- Dates ----
   deadline     DateTime?

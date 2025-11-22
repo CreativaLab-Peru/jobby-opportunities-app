@@ -41,8 +41,7 @@ export async function PUT(
     console.log('Datos recibidos:', body);
     
     // Preparar los datos con valores por defecto para arrays y conversiones necesarias
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateData: any = {
+    const updateData = {
       type: body.type,
       title: body.title,
       organization: body.organization,
@@ -52,41 +51,18 @@ export async function PUT(
       tags: body.tags || [],
       requiredSkills: body.requiredSkills || [],
       optionalSkills: body.optionalSkills || [],
-      normalizedTags: body.normalizedTags || [],
-    };
-    
-    // Campos opcionales - solo agregar si tienen valor
-    if (body.minAge !== undefined && body.minAge !== null && body.minAge !== '') {
-      updateData.minAge = parseInt(body.minAge);
-    }
-    if (body.maxAge !== undefined && body.maxAge !== null && body.maxAge !== '') {
-      updateData.maxAge = parseInt(body.maxAge);
-    }
-    if (body.fieldOfStudy) updateData.fieldOfStudy = body.fieldOfStudy;
-    if (body.modality) updateData.modality = body.modality;
-    if (body.language) updateData.language = body.language;
-    if (body.fundingAmount !== undefined && body.fundingAmount !== null && body.fundingAmount !== '') {
-      updateData.fundingAmount = parseFloat(body.fundingAmount);
-    }
-    if (body.currency) updateData.currency = body.currency;
-    if (body.popularityScore !== undefined && body.popularityScore !== null) {
-      updateData.popularityScore = parseInt(body.popularityScore);
-    }
-    
-    // Manejar deadline - convertir string a Date o null
-    if (body.deadline && body.deadline !== '') {
-      updateData.deadline = new Date(body.deadline);
-    } else if (body.deadline === '') {
-      updateData.deadline = null;
-    }
-    
-    // Manejar salaryRange si existe
-    if (body.salaryRange) {
-      updateData.salaryRange = {
+      fieldOfStudy: body.fieldOfStudy || null,
+      modality: body.modality || null,
+      language: body.language || null,
+      fundingAmount: body.fundingAmount ? parseFloat(body.fundingAmount) : null,
+      currency: body.currency || null,
+      popularityScore: body.popularityScore ? parseInt(body.popularityScore) : 0,
+      deadline: body.deadline ? new Date(body.deadline) : null,
+      salaryRange: (body.salaryRange?.min || body.salaryRange?.max) ? {
         min: body.salaryRange.min ? parseFloat(body.salaryRange.min) : null,
         max: body.salaryRange.max ? parseFloat(body.salaryRange.max) : null,
-      };
-    }
+      } : null
+    };
     
     const opportunity = await prisma.opportunity.update({
       where: { id },

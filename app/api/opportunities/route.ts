@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
     const opportunities = await prisma.opportunity.findMany({
       where: { 
-        userId: userID // ← Solo oportunidades del usuario actual
+        userId: userID
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -33,7 +33,6 @@ export async function GET(request: Request) {
 // POST - Crear nueva oportunidad
 export async function POST(request: Request) {
   try {
-    // TODO: Obtener userID del request (autenticación)
     const userID = request.headers.get('user-id');
     
     if (!userID) {
@@ -49,8 +48,7 @@ export async function POST(request: Request) {
     console.log('Datos recibidos:', body);
     
     // Preparar los datos con valores por defecto y conversiones necesarias
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const createData: any = {
+    const createData = {
       type: body.type,
       title: body.title,
       organization: body.organization,
@@ -60,40 +58,19 @@ export async function POST(request: Request) {
       tags: body.tags || [],
       requiredSkills: body.requiredSkills || [],
       optionalSkills: body.optionalSkills || [],
-      normalizedTags: body.normalizedTags || [],
       userId: userID,
-    };
-    
-    // Campos opcionales - solo agregar si tienen valor
-    if (body.minAge !== undefined && body.minAge !== null && body.minAge !== '') {
-      createData.minAge = parseInt(body.minAge);
-    }
-    if (body.maxAge !== undefined && body.maxAge !== null && body.maxAge !== '') {
-      createData.maxAge = parseInt(body.maxAge);
-    }
-    if (body.fieldOfStudy) createData.fieldOfStudy = body.fieldOfStudy;
-    if (body.modality) createData.modality = body.modality;
-    if (body.language) createData.language = body.language;
-    if (body.fundingAmount !== undefined && body.fundingAmount !== null && body.fundingAmount !== '') {
-      createData.fundingAmount = parseFloat(body.fundingAmount);
-    }
-    if (body.currency) createData.currency = body.currency;
-    if (body.popularityScore !== undefined && body.popularityScore !== null) {
-      createData.popularityScore = parseInt(body.popularityScore);
-    }
-    
-    // Manejar deadline - convertir string a Date o dejar undefined
-    if (body.deadline && body.deadline !== '') {
-      createData.deadline = new Date(body.deadline);
-    }
-    
-    // Manejar salaryRange si existe
-    if (body.salaryRange && (body.salaryRange.min || body.salaryRange.max)) {
-      createData.salaryRange = {
+      fieldOfStudy: body.fieldOfStudy || null,
+      modality: body.modality || null,
+      language: body.language || null,
+      fundingAmount: body.fundingAmount ? parseFloat(body.fundingAmount) : null,
+      currency: body.currency || null,
+      popularityScore: body.popularityScore ? parseInt(body.popularityScore) : 0,
+      deadline: body.deadline ? new Date(body.deadline) : null,
+      salaryRange: (body.salaryRange?.min || body.salaryRange?.max) ? {
         min: body.salaryRange.min ? parseFloat(body.salaryRange.min) : null,
         max: body.salaryRange.max ? parseFloat(body.salaryRange.max) : null,
-      };
-    }
+      } : null
+    };
     
     const opportunity = await prisma.opportunity.create({
       data: createData

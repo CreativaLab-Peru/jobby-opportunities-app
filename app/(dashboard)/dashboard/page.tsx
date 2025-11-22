@@ -3,16 +3,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from '@/lib/auth-client';
 import OpportunityList from '@/components/OpportunityList';
-import OpportunityForm from '@/components/OpportunityForm';
-import { Opportunity, OpportunityFormData, OpportunityListItem } from '../../types/opportunity';
+import { OpportunityListItem } from '../../types/opportunity';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   
   const [opportunities, setOpportunities] = useState<OpportunityListItem[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingOpportunity, setEditingOpportunity] = useState<Opportunity | undefined>();
   const [loading, setLoading] = useState(true);
 
   // Redirigir si no está autenticado
@@ -50,72 +48,6 @@ export default function DashboardPage() {
     }
   }, [session?.user, fetchOpportunities]);
 
-  const handleCreate = async (formData: OpportunityFormData) => {
-    try {
-      console.log('Enviando datos:', formData);
-      
-      const response = await fetch('/api/opportunities', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-         'user-id': session?.user?.id || ''
-        },
-          body: JSON.stringify(formData),
-      });
-
-      console.log('Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error response:', errorData);
-        throw new Error(errorData.error || 'Error al crear oportunidad');
-      }
-
-      const result = await response.json();
-      console.log('Oportunidad creada:', result);
-      
-      setShowForm(false);
-      fetchOpportunities();
-      
-    } catch (error) {
-      console.error('Error completo:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      alert(`Error al crear oportunidad: ${errorMessage}`);
-    }
-  };
-
-  const handleUpdate = async (formData: OpportunityFormData) => {
-    if (editingOpportunity) {
-      try {
-        console.log('Actualizando oportunidad:', editingOpportunity.id, formData);
-        
-        const response = await fetch(`/api/opportunities/${editingOpportunity.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
-
-        console.log('Response status:', response.status);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Error response:', errorData);
-          throw new Error(errorData.error || 'Error al actualizar oportunidad');
-        }
-
-        const result = await response.json();
-        console.log('Oportunidad actualizada:', result);
-
-        setEditingOpportunity(undefined);
-        fetchOpportunities();
-      } catch (error) {
-        console.error('Error completo:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-        alert(`Error al actualizar oportunidad: ${errorMessage}`);
-      }
-    }
-  };
-
   const handleDelete = async (id: string) => {
     if (confirm('¿Estás seguro de que quieres eliminar esta oportunidad?')) {
       try {
@@ -127,7 +59,7 @@ export default function DashboardPage() {
           throw new Error('Error al eliminar oportunidad');
         }
 
-        fetchOpportunities(); // Recargar la lista
+        fetchOpportunities();
       } catch (error) {
         console.error('Error:', error);
         alert('Error al eliminar oportunidad');
@@ -144,7 +76,7 @@ export default function DashboardPage() {
   }
 
   if (!session) {
-    return null; // Será redirigido por el useEffect
+    return null; 
   }
 
   return (
@@ -174,54 +106,34 @@ export default function DashboardPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="mb-6 flex justify-between items-center">
             <h2 className="text-2xl font-bold text-gray-900">
-              Oportunidades ({opportunities.length})
+              Mis Oportunidades ({opportunities.length})
             </h2>
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md text-white font-medium"
+            <Link
+              href="/opportunities/new"
+              className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md text-white font-medium inline-block"
             >
-              Nueva Oportunidad
-            </button>
+              + Nueva Oportunidad
+            </Link>
           </div>
-
-          {showForm && (
-            <div className="mb-6">
-              <OpportunityForm
-                onSubmit={handleCreate}
-                onCancel={() => setShowForm(false)}
-              />
-            </div>
-          )}
-
-          {editingOpportunity && (
-            <div className="mb-6">
-              <OpportunityForm
-                opportunity={editingOpportunity}
-                onSubmit={handleUpdate}
-                onCancel={() => setEditingOpportunity(undefined)}
-              />
-            </div>
-          )}
 
           {loading ? (
             <div className="bg-white shadow rounded-lg p-6 text-center">
               <div className="text-lg">Cargando oportunidades...</div>
             </div>
+          ) : opportunities.length === 0 ? (
+            <div className="bg-white shadow rounded-lg p-6 text-center">
+              <p className="text-gray-500 mb-4">No tienes oportunidades creadas aún</p>
+              <Link
+                href="/opportunities/new"
+                className="text-indigo-600 hover:text-indigo-500 font-medium"
+              >
+                Crear tu primera oportunidad
+              </Link>
+            </div>
           ) : (
             <OpportunityList
               opportunities={opportunities}
-              onEdit={(opp) => {
-                // Convertir OpportunityListItem a Opportunity para edición
-                setEditingOpportunity({
-                  ...opp,
-                  eligibleLevels: [],
-                  eligibleCountries: [],
-                  tags: [],
-                  requiredSkills: [],
-                  optionalSkills: [],
-                  normalizedTags: []
-                });
-              }}
+              onEdit={(opp) => router.push(`/opportunities/${opp.id}/edit`)}
               onDelete={handleDelete}
             />
           )}
