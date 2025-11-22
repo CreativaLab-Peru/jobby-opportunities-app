@@ -1,6 +1,6 @@
 'use client';
+import { OpportunityListItem } from '@/app/types/opportunity';
 import { useState } from 'react';
-import { OpportunityListItem } from '../types/opportunity';
 
 interface OpportunityListProps {
   opportunities: OpportunityListItem[];
