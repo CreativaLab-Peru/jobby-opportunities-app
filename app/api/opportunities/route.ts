@@ -19,9 +19,9 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '20');
     
     // Filtros
-    const types = searchParams.get('types')?.split(',').filter(t => t);
-    const levels = searchParams.get('levels')?.split(',').filter(l => l);
-    const countries = searchParams.get('countries')?.split(',').filter(c => c);
+    const types = searchParams.getAll('types').filter(t => t);
+    const levels = searchParams.getAll('levels').filter(l => l);
+    const countries = searchParams.getAll('countries').filter(c => c);
     const modality = searchParams.get('modality');
     const language = searchParams.get('language');
     const search = searchParams.get('search');
@@ -29,6 +29,8 @@ export async function GET(request: Request) {
     const deadlineTo = searchParams.get('deadlineTo');
     const salaryMin = searchParams.get('salaryMin');
     const salaryMax = searchParams.get('salaryMax');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Construir objeto where dinámicamente
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,12 +93,22 @@ export async function GET(request: Request) {
     // Obtener total de resultados
     const total = await prisma.opportunity.count({ where });
 
+    // Construir orderBy dinámicamente
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const orderBy: any = {};
+    
+    // Mapeo de campos válidos para ordenar
+    const validSortFields = ['createdAt', 'deadline', 'title', 'updatedAt'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    
+    orderBy[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
+
     // Obtener oportunidades paginadas
     const opportunities = await prisma.opportunity.findMany({
       where,
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy
     });
 
     return NextResponse.json({
@@ -140,6 +152,7 @@ export async function POST(request: Request) {
       title: body.title,
       organization: body.organization,
       url: body.url || null,
+      description: body.description || null,
       eligibleLevels: body.eligibleLevels || [],
       eligibleCountries: body.eligibleCountries || [],
       tags: body.tags || [],

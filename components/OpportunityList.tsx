@@ -1,6 +1,5 @@
 'use client';
 import { OpportunityListItem } from '@/app/types/opportunity';
-import { useState } from 'react';
 
 interface OpportunityListProps {
   opportunities: OpportunityListItem[];
@@ -9,26 +8,8 @@ interface OpportunityListProps {
 }
 
 export default function OpportunityList({ opportunities, onEdit, onDelete }: OpportunityListProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredOpportunities = opportunities.filter(opp =>
-    opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    opp.organization.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    opp.type.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
-    <div className="bg-white shadow rounded-lg">
-      <div className="p-4 border-b">
-        <input
-          type="text"
-          placeholder="Buscar por título, organización o tipo..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-        />
-      </div>
-      
+    <div className="bg-white shadow rounded-lg mt-6">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -51,7 +32,7 @@ export default function OpportunityList({ opportunities, onEdit, onDelete }: Opp
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredOpportunities.map((opportunity) => (
+            {opportunities.map((opportunity) => (
               <tr key={opportunity.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{opportunity.title}</div>
@@ -101,7 +82,7 @@ export default function OpportunityList({ opportunities, onEdit, onDelete }: Opp
           </tbody>
         </table>
         
-        {filteredOpportunities.length === 0 && (
+        {opportunities.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             No se encontraron oportunidades
           </div>

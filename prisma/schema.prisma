@@ -39,6 +39,7 @@ model Opportunity {
   title        String
   organization String
   url          String?
+  description  String?
 
   // Relación con el usuario que creó la oportunidad
   userId       String   @db.ObjectId

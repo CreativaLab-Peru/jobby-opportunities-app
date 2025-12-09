@@ -17,7 +17,10 @@ export default function DashboardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalOpportunities, setTotalOpportunities] = useState(0);
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [filters, setFilters] = useState<Filters>({
+    search: null,
     types: [],
     levels: [],
     countries: [],
@@ -46,6 +49,9 @@ export default function DashboardPage() {
       params.append('page', currentPage.toString());
       params.append('limit', '20');
       
+      if (filters.search) {
+        params.append('search', filters.search);
+      }
       if (filters.types.length > 0) {
         filters.types.forEach(type => params.append('types', type));
       }
@@ -74,6 +80,10 @@ export default function DashboardPage() {
         params.append('salaryMax', filters.salaryMax);
       }
 
+      // Ordenamiento
+      params.append('sortBy', sortBy);
+      params.append('sortOrder', sortOrder);
+
       const response = await fetch(`/api/opportunities?${params.toString()}`, {
         headers: { 
             'user-id': session.user.id
@@ -91,7 +101,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id, currentPage, filters]);
+  }, [session?.user?.id, currentPage, filters, sortBy, sortOrder]);
 
   // Cargar oportunidades
   useEffect(() => {
@@ -108,6 +118,7 @@ export default function DashboardPage() {
 
   // Calcular filtros activos
   const activeFiltersCount = 
+    (filters.search ? 1 : 0) +
     filters.types.length +
     filters.levels.length +
     filters.countries.length +
@@ -179,16 +190,36 @@ export default function DashboardPage() {
       {/* Contenido principal */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="mb-6 flex justify-between items-center">
+          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold text-gray-900">
               Mis Oportunidades ({totalOpportunities})
             </h2>
-            <Link
-              href="/opportunities/new"
-              className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md text-white font-medium inline-block"
-            >
-              + Nueva Oportunidad
-            </Link>
+            <div className="flex gap-3">
+              {/* Selector de ordenamiento */}
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split('-');
+                  setSortBy(field);
+                  setSortOrder(order as 'asc' | 'desc');
+                  setCurrentPage(1);
+                }}
+                className="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
+              >
+                <option value="createdAt-desc">Más recientes</option>
+                <option value="createdAt-asc">Más antiguas</option>
+                <option value="deadline-asc">Deadline más cercano</option>
+                <option value="deadline-desc">Deadline más lejano</option>
+                <option value="title-asc">Título A-Z</option>
+                <option value="title-desc">Título Z-A</option>
+              </select>
+              <Link
+                href="/opportunities/new"
+                className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md text-white font-medium inline-block whitespace-nowrap"
+              >
+                + Nueva Oportunidad
+              </Link>
+            </div>
           </div>
 
           {/* Panel de filtros */}

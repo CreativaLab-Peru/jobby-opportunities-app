@@ -9,6 +9,7 @@ export interface OpportunityBase {
   title: string;
   organization: string;
   url?: string;
+  description?: string;
   eligibleLevels: string[];
   eligibleCountries: string[];
   tags: string[];

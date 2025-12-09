@@ -46,6 +46,7 @@ export async function PUT(
       title: body.title,
       organization: body.organization,
       url: body.url || null,
+      description: body.description || null,
       eligibleLevels: body.eligibleLevels || [],
       eligibleCountries: body.eligibleCountries || [],
       tags: body.tags || [],
