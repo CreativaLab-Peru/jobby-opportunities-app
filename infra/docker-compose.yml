@@ -7,55 +7,35 @@ services:
     restart: always
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-      MONGO_INITDB_DATABASE: jobby
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     volumes:
       - mongo_data:/data/db
-    command: ["--replSet", "rs0", "--bind_ip_all", "--keyFile", "/data/replica.key"]
-    entrypoint:
-      - bash
-      - -c
-      - |
-        openssl rand -base64 756 > /data/replica.key
-        chmod 400 /data/replica.key
-        chown 999:999 /data/replica.key
-        exec docker-entrypoint.sh mongod --replSet rs0 --bind_ip_all --keyFile /data/replica.key
-    healthcheck:
-      test: |
-        mongosh -u root -p rootpassword --authenticationDatabase admin --eval "
-        try {
-          rs.status();
-          print('replica set already initialized');
-        } catch(e) {
-          if (e.codeName === 'NotYetInitialized') {
-            rs.initiate({
-              _id: 'rs0',
-              members: [{ _id: 0, host: 'localhost:27017' }]
-            });
-            print('replica set initialized');
-          }
-        }"
-      interval: 10s
-      timeout: 10s
-      start_period: 40s
-      retries: 5
 
-  mongo-express:
-    image: mongo-express:latest
-    container_name: jobby-mongo-express
-    restart: always
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: rootpassword
-      ME_CONFIG_MONGODB_URL: mongodb://root:rootpassword@mongo:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: admin
+  mongo-init-replica:
+    image: mongo:7
     depends_on:
-      - mongo
+      mongo:
+        condition: service_started
+    entrypoint: >
+      bash -c "
+        echo 'Esperando a que Mongo esté listo...' &&
+        for i in {1..15}; do
+          mongosh --host mongo:27017 --eval 'db.runCommand({ ping: 1 })' &> /dev/null && break;
+          echo 'Esperando...';
+          sleep 1;
+        done;
+
+        echo 'Inicializando Replica Set...' &&
+        mongosh --host mongo:27017 --eval '
+          if (!rs.status().ok) {
+            rs.initiate({
+              _id: \"rs0\",
+              members: [{ _id: 0, host: \"mongo:27017\" }]
+            });
+          }
+        ';
+      "
+    restart: "no"
 
 volumes:
   mongo_data:

@@ -22,89 +22,107 @@ type SalaryRange {
 // Tag — master dictionary for semantic search
 // -----------------------------------------------------
 model Tag {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  name       String   @unique
-  synonyms   String[]
-  category   String?
-  createdAt  DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  synonyms  String[]
+  category  String?
+  createdAt DateTime @default(now())
+
+  @@map("tags")
+}
+
+enum OpportunityType {
+  INTERNSHIP
+  SCHOLARSHIP
+  EXCHANGE_PROGRAM
+  EMPLOYMENT
+  RESEARCH_FELLOWSHIP
+  GRADUATE_PROGRAM
+  FREELANCE
+  FULL_TIME
+  PART_TIME
+  OTHER
 }
 
 // -----------------------------------------------------
 // Opportunity — main resource
 // -----------------------------------------------------
 model Opportunity {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  type         String
+  type         OpportunityType @default(OTHER)
   title        String
   organization String
   url          String?
   description  String?
 
   // Relación con el usuario que creó la oportunidad
-  userId       String   @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // ---- Eligibility ----
   eligibleLevels    String[]
   eligibleCountries String[]
 
   // ---- Tagging ----
-  tags            String[]
-  requiredSkills  String[]
-  optionalSkills  String[]
+  tags           String[]
+  requiredSkills String[]
+  optionalSkills String[]
 
   // ---- Academic / Job ----
-  fieldOfStudy    String?
-  modality        String?
-  language        String?
-  fundingAmount   Float?
-  currency        String?
+  fieldOfStudy  String?
+  modality      String?
+  language      String?
+  fundingAmount Float?
+  currency      String?
 
-  salaryRange     SalaryRange?
+  salaryRange SalaryRange?
 
   // ---- Dates ----
-  deadline     DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  deadline  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // ---- Scoring ----
   popularityScore Int @default(0)
+
+  @@map("opportunities")
 }
 
 // -----------------------------------------------------
 // OpportunityCache — per-user match caching
 // -----------------------------------------------------
 model OpportunityCache {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  userId         String
-  opportunityId  String
-  score          Int
-  tagsMatched    String[]
+  userId        String
+  opportunityId String
+  score         Int
+  tagsMatched   String[]
 
-  createdAt      DateTime @default(now())
-  expiresAt      DateTime
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@map("opportunity_caches")
 }
 
 // -----------------------------------------------------
 // User
 // -----------------------------------------------------
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  email         String        @unique
+  emailVerified Boolean       @default(false)
   name          String
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  @@map("users")
-  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   // Relaciones
   opportunities Opportunity[]
   sessions      Session[]
   accounts      Account[]
+
+  @@map("users")
 }
 
 // -----------------------------------------------------
@@ -128,20 +146,20 @@ model Session {
 // Account - Requerido por Better Auth (para OAuth)
 // -----------------------------------------------------
 model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  accountId         String
-  providerId        String
-  userId            String  @db.ObjectId
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken       String?
-  refreshToken      String?
-  idToken           String?
-  accessTokenExpiresAt DateTime?
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  accountId             String
+  providerId            String
+  userId                String    @db.ObjectId
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
-  scope             String?
-  password          String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@map("accounts")
 }
