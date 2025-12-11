@@ -1,1 +1,1 @@
-export const KEY_STS = process.env.KEY_STS || '';
+export const KEY_STS = process.env.KEY_SYSTEM_TO_SYSTEM || '';

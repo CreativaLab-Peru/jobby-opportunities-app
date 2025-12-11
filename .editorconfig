@@ -37,5 +37,5 @@ indent_size = 2
 [dist/**]
 root = false
 
-/.next/**
+[/.next/**]
 root = false
