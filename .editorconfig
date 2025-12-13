@@ -1,0 +1,41 @@
+# Root of the project
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Markdown files should not trim whitespace (some markdown syntax requires it)
+[*.md]
+trim_trailing_whitespace = false
+
+# YAML (common in CI/CD, workflows)
+[*.{yml,yaml}]
+indent_size = 2
+
+# JSON / TypeScript / JavaScript
+[*.{json,js,jsx,ts,tsx}]
+indent_size = 2
+
+# For package.json, keep indentation at 2 (npm standard)
+[package.json]
+indent_size = 2
+
+# Style files
+[*.{css,scss,sass}]
+indent_size = 2
+
+# For Next.js route handlers or API folders
+[app/api/**.{ts,tsx}]
+indent_size = 2
+
+# Ignore dist and builds (just in case editor tries to apply rules)
+[dist/**]
+root = false
+
+[/.next/**]
+root = false
