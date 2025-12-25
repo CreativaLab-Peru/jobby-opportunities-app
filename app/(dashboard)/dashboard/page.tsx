@@ -1,15 +1,18 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession, signOut } from '@/lib/auth-client';
+import { useSession } from '@/lib/auth-client';
 import OpportunityList from '@/components/OpportunityList';
 import FilterPanel, { Filters } from '@/components/FilterPanel';
 import Pagination from '@/components/Pagination';
 import { OpportunityListItem } from '../../types/opportunity';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Plus } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { data: session, isPending } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   
   const [opportunities, setOpportunities] = useState<OpportunityListItem[]>([]);
@@ -31,13 +34,6 @@ export default function DashboardPage() {
     salaryMin: null,
     salaryMax: null,
   });
-
-  // Redirigir si no está autenticado
-  useEffect(() => {
-    if (!isPending && !session) {
-      router.push('/login');
-    }
-  }, [session, isPending, router]);
 
   const fetchOpportunities = useCallback(async () => {
     if (!session?.user?.id) return;
@@ -153,115 +149,93 @@ export default function DashboardPage() {
     }
   };
 
-  if (isPending) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Cargando...</div>
-      </div>
-    );
-  }
-
   if (!session) {
     return null; 
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold">Dashboard</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Hola, {session?.user?.name}</span>
-              <button
-                onClick={() => signOut()}
-                className="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-md text-white text-sm font-medium"
-              >
-                Cerrar Sesión
-              </button>
-            </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <p className="text-muted-foreground mt-1">
+            {totalOpportunities} {totalOpportunities === 1 ? 'oportunidad' : 'oportunidades'} {activeFiltersCount > 0 && `(${activeFiltersCount} filtros activos)`}
+          </p>
+        </div>
+        <div className="flex gap-3 w-full sm:w-auto">
+          {/* Selector de ordenamiento */}
+          <select
+            value={`${sortBy}-${sortOrder}`}
+            onChange={(e) => {
+              const [field, order] = e.target.value.split('-');
+              setSortBy(field);
+              setSortOrder(order as 'asc' | 'desc');
+              setCurrentPage(1);
+            }}
+            className="px-3 py-2 border rounded-md bg-background text-sm flex-1 sm:flex-none"
+          >
+            <option value="createdAt-desc">Más recientes</option>
+            <option value="createdAt-asc">Más antiguas</option>
+            <option value="deadline-asc">Deadline más cercano</option>
+            <option value="deadline-desc">Deadline más lejano</option>
+            <option value="title-asc">Título A-Z</option>
+            <option value="title-desc">Título Z-A</option>
+          </select>
+          <Button asChild className="whitespace-nowrap">
+            <Link href="/opportunities/new">
+              <Plus className="h-4 w-4" />
+              Nueva Oportunidad
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Panel de filtros */}
+      <FilterPanel 
+        onFilterChange={handleFilterChange}
+        activeFiltersCount={activeFiltersCount}
+      />
+
+      {/* Contenido */}
+      {loading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      ) : opportunities.length === 0 ? (
+        <div className="bg-card border rounded-lg p-12 text-center">
+          <div className="max-w-md mx-auto space-y-4">
+            <h3 className="text-xl font-semibold">No se encontraron oportunidades</h3>
+            {activeFiltersCount > 0 ? (
+              <p className="text-muted-foreground">Intenta ajustar los filtros para ver más resultados</p>
+            ) : (
+              <>
+                <p className="text-muted-foreground">Comienza agregando tu primera oportunidad</p>
+                <Button asChild className="mt-4">
+                  <Link href="/opportunities/new">
+                    <Plus className="h-4 w-4" />
+                    Crear Primera Oportunidad
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
-      </nav>
-
-      {/* Contenido principal */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Mis Oportunidades ({totalOpportunities})
-            </h2>
-            <div className="flex gap-3">
-              {/* Selector de ordenamiento */}
-              <select
-                value={`${sortBy}-${sortOrder}`}
-                onChange={(e) => {
-                  const [field, order] = e.target.value.split('-');
-                  setSortBy(field);
-                  setSortOrder(order as 'asc' | 'desc');
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
-              >
-                <option value="createdAt-desc">Más recientes</option>
-                <option value="createdAt-asc">Más antiguas</option>
-                <option value="deadline-asc">Deadline más cercano</option>
-                <option value="deadline-desc">Deadline más lejano</option>
-                <option value="title-asc">Título A-Z</option>
-                <option value="title-desc">Título Z-A</option>
-              </select>
-              <Link
-                href="/opportunities/new"
-                className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md text-white font-medium inline-block whitespace-nowrap"
-              >
-                + Nueva Oportunidad
-              </Link>
-            </div>
-          </div>
-
-          {/* Panel de filtros */}
-          <FilterPanel 
-            onFilterChange={handleFilterChange}
-            activeFiltersCount={activeFiltersCount}
+      ) : (
+        <>
+          <OpportunityList
+            opportunities={opportunities}
+            onEdit={(opp) => router.push(`/opportunities/${opp.id}/edit`)}
+            onDelete={handleDelete}
           />
-
-          {loading ? (
-            <div className="bg-white shadow rounded-lg p-6 text-center mt-6">
-              <div className="text-lg">Cargando oportunidades...</div>
-            </div>
-          ) : opportunities.length === 0 ? (
-            <div className="bg-white shadow rounded-lg p-6 text-center mt-6">
-              <p className="text-gray-500 mb-4">No se encontraron oportunidades</p>
-              {activeFiltersCount > 0 ? (
-                <p className="text-sm text-gray-400">Intenta ajustar los filtros</p>
-              ) : (
-                <Link
-                  href="/opportunities/new"
-                  className="text-indigo-600 hover:text-indigo-500 font-medium"
-                >
-                  Crear tu primera oportunidad
-                </Link>
-              )}
-            </div>
-          ) : (
-            <>
-              <OpportunityList
-                opportunities={opportunities}
-                onEdit={(opp) => router.push(`/opportunities/${opp.id}/edit`)}
-                onDelete={handleDelete}
-              />
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </>
-          )}
-        </div>
-      </main>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
     </div>
   );
 }
