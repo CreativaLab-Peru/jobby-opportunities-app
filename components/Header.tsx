@@ -28,7 +28,7 @@ const Header = ({ authenticated }: HeaderProps) => {
                                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded-lg transition-all"
                             >
                                 <LayoutDashboard className="w-4 h-4" />
-                                Dashboard
+                                Panel de control
                             </a>
                             <a 
                                 href="/profile" 

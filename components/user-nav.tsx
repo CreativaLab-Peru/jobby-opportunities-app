@@ -99,7 +99,7 @@ export function UserNav({ user }: UserNavProps) {
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="cursor-pointer flex items-center">
             <User className="mr-2 h-4 w-4" />
-            <span>Dashboard</span>
+            <span>Panel de control</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

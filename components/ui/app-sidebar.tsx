@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Dashboard", href: "/dashboard", icon: Home },
+  { title: "Panel de control", href: "/dashboard", icon: Home },
   { title: "Oportunidades", href: "/opportunities/new", icon: Briefcase },
 ] as const;
 
@@ -43,7 +43,7 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold">Levely</span>
-            <span className="text-xs text-muted-foreground">Admin Panel</span>
+            <span className="text-xs text-muted-foreground">Panel de administración</span>
           </div>
         </div>
       </SidebarHeader>
