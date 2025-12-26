@@ -658,11 +658,12 @@ const SidebarMenuSkeleton = React.forwardRef<
     showIcon?: boolean
   }
 >(({ className, showIcon = false, ...props }, ref) => {
-  // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    // eslint-disable-next-line react-hooks/purity
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
+  // Random width between 50 to 90%, generated once per component instance.
+  const widthRef = React.useRef<string>()
+  if (!widthRef.current) {
+    widthRef.current = `${Math.floor(Math.random() * 40) + 50}%`
+  }
+  const width = widthRef.current
 
   return (
     <div
