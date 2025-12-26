@@ -22,13 +22,48 @@ interface UserNavProps {
 }
 
 export function UserNav({ user }: UserNavProps) {
-  const initials = user.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
+  const getInitials = (name: string, email: string): string => {
+    const safeName = (name ?? "").trim();
+    const safeEmail = (email ?? "").trim();
 
+    // If there is no usable name, fall back to email or a placeholder.
+    if (!safeName) {
+      if (safeEmail) {
+        return safeEmail[0]!.toUpperCase();
+      }
+      return "?";
+    }
+
+    // Take the first character of each word, keep only alphanumerics, and limit to 2.
+    const wordInitials = safeName
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .filter((ch) => !!ch && /[A-Za-z0-9]/.test(ch))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+    if (wordInitials) {
+      return wordInitials;
+    }
+
+    // If that failed (e.g., name is only special characters), strip non-alphanumerics
+    // from the whole name and use up to the first 2 characters.
+    const alnumFromName = safeName.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 2);
+    if (alnumFromName) {
+      return alnumFromName;
+    }
+
+    // Final fallback: use email initial if available, otherwise a placeholder.
+    if (safeEmail) {
+      return safeEmail[0]!.toUpperCase();
+    }
+
+    return "?";
+  };
+
+  const initials = getInitials(user.name, user.email);
   const handleSignOut = async () => {
     await signOut();
   };
