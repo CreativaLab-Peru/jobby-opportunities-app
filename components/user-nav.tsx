@@ -65,7 +65,14 @@ export function UserNav({ user }: UserNavProps) {
 
   const initials = getInitials(user.name, user.email);
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      if (typeof window !== "undefined") {
+        window.alert("Ocurrió un error al cerrar sesión. Por favor, inténtalo de nuevo.");
+      }
+    }
   };
 
   return (
