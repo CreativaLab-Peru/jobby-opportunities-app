@@ -10,6 +10,7 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = request.nextUrl.pathname.startsWith("/login") || 
                      request.nextUrl.pathname.startsWith("/register");
   const isDashboardPage = request.nextUrl.pathname.startsWith("/dashboard");
+  const isOpportunitiesPage = request.nextUrl.pathname.startsWith("/opportunities");
 
   // Redirect authenticated users away from auth pages
   if (session && isAuthPage) {
@@ -17,7 +18,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect unauthenticated users to login
-  if (!session && isDashboardPage) {
+  if (!session && (isDashboardPage || isOpportunitiesPage)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
