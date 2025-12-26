@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -14,13 +12,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { data: session, isPending } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isPending && !session) {
-      router.push("/login");
-    }
-  }, [session, isPending, router]);
 
   if (isPending) {
     return (
