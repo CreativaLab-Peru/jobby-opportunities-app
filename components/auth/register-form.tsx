@@ -55,7 +55,7 @@ export function RegisterForm() {
             <Briefcase className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Registra tu empresa
+            Registre su empresa
           </h2>
           <p className="text-gray-600">
             Comienza a gestionar oportunidades laborales
