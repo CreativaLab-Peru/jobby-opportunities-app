@@ -109,7 +109,7 @@ export function RegisterForm() {
                     value={formData.email}
                     onChange={handleChange}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
-                    placeholder="contacto@empresa.com"
+                    placeholder="empresa@ejemplo.com"
                   />
                 </div>
               </div>
