@@ -20,16 +20,32 @@ const Footer = () => {
               Plataforma empresarial para la gestión eficiente de oportunidades laborales, becas y programas de desarrollo profesional.
             </p>
             <div className="flex items-center gap-3 mt-4">
-              <a href="#" className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+              <a
+                href="#"
+                aria-label="Visitar perfil de Levely en LinkedIn"
+                className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              >
                 <Linkedin className="w-4 h-4" />
               </a>
-              <a href="#" className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+              <a
+                href="#"
+                aria-label="Visitar perfil de Levely en Twitter"
+                className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              >
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+              <a
+                href="#"
+                aria-label="Visitar repositorio de Levely en GitHub"
+                className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              >
                 <Github className="w-4 h-4" />
               </a>
-              <a href="mailto:contacto@levely.com" className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+              <a
+                href="mailto:contacto@levely.com"
+                aria-label="Enviar correo a contacto@levely.com"
+                className="flex items-center justify-center w-9 h-9 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              >
                 <Mail className="w-4 h-4" />
               </a>
             </div>
