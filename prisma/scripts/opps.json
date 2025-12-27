@@ -1,0 +1,694 @@
+{
+  "opportunities": [
+    {
+      "type": "SCHOLARSHIP",
+      "title": "Beca STEM para Jóvenes Investigadores",
+      "organization": "Fundación Innovar",
+      "url": "https://example.com/beca-stem",
+      "description": "Beca completa para investigaciones en ciencia, tecnología, ingeniería y matemáticas.",
+      "eligibleLevels": [
+        "Bachelor",
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "Argentina"
+      ],
+      "tags": [
+        "STEM",
+        "Scholarship",
+        "Research"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Inglés intermedio"
+      ],
+      "fieldOfStudy": "STEM",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "9000",
+      "currency": "USD",
+      "popularityScore": "88",
+      "deadline": "2025-07-10",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "INTERNSHIP",
+      "title": "Programa de Intercambio Académico Asia 2025",
+      "organization": "Asian Global University",
+      "url": "https://example.com/intercambio-asia",
+      "description": "Un semestre de estudios en universidades de Japón, Corea o Singapur.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Latinoamérica"
+      ],
+      "tags": [
+        "Exchange",
+        "Asia",
+        "Global Mobility"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Inglés B1"
+      ],
+      "fieldOfStudy": "Cualquier área",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "4000",
+      "currency": "USD",
+      "popularityScore": "93",
+      "deadline": "2025-05-18",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "EXCHANGE_PROGRAM",
+      "title": "Internship en Desarrollo Web Full Stack",
+      "organization": "DevBuilders",
+      "url": "https://example.com/intern-fullstack",
+      "description": "Pasantía intensiva para desarrollo con Node.js y React.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru"
+      ],
+      "tags": [
+        "Full Stack",
+        "Node.js",
+        "React"
+      ],
+      "requiredSkills": [
+        "JavaScript"
+      ],
+      "optionalSkills": [
+        "Git"
+      ],
+      "fieldOfStudy": "Software Engineering",
+      "modality": "Remoto",
+      "language": "Español",
+      "fundingAmount": "350",
+      "currency": "USD",
+      "popularityScore": "70",
+      "deadline": "2025-03-22",
+      "salaryRange": {
+        "min": "200",
+        "max": "400"
+      }
+    },
+    {
+      "type": "EMPLOYMENT",
+      "title": "Junior QA Analyst",
+      "organization": "Quality Labs",
+      "url": "https://example.com/qa-junior",
+      "description": "Puesto para profesionales interesados en pruebas manuales y automatizadas.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "Colombia"
+      ],
+      "tags": [
+        "QA",
+        "Testing"
+      ],
+      "requiredSkills": [
+        "Testing Manual"
+      ],
+      "optionalSkills": [
+        "Selenium"
+      ],
+      "fieldOfStudy": "Computer Science",
+      "modality": "Presencial",
+      "language": "Español",
+      "fundingAmount": null,
+      "currency": null,
+      "popularityScore": "77",
+      "deadline": null,
+      "salaryRange": {
+        "min": "1200",
+        "max": "1800"
+      }
+    },
+    {
+      "type": "SCHOLARSHIP",
+      "title": "Beca Humanidades Globales",
+      "organization": "World Cultural Foundation",
+      "url": "https://example.com/beca-humanidades",
+      "description": "Beca para estudiantes que investigan temas de filosofía, historia o artes sociales.",
+      "eligibleLevels": [
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "Chile"
+      ],
+      "tags": [
+        "Humanities",
+        "Scholarship"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Portafolio académico"
+      ],
+      "fieldOfStudy": "Humanidades",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "6000",
+      "currency": "USD",
+      "popularityScore": "84",
+      "deadline": "2025-09-01",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "INTERNSHIP",
+      "title": "Intercambio Universitario Canadá",
+      "organization": "Northern University",
+      "url": "https://example.com/intercambio-canada",
+      "description": "Programa para estudiar un semestre en universidades canadienses.",
+      "eligibleLevels": [
+        "Bachelor",
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Latinoamérica"
+      ],
+      "tags": [
+        "Canada",
+        "Exchange Program"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Inglés B2"
+      ],
+      "fieldOfStudy": "Cualquier campo",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "5000",
+      "currency": "CAD",
+      "popularityScore": "89",
+      "deadline": "2025-04-25",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "EXCHANGE_PROGRAM",
+      "title": "Pasantía en Machine Learning",
+      "organization": "AI Future Labs",
+      "url": "https://example.com/intern-ml",
+      "description": "Oportunidad para estudiantes interesados en modelos predictivos y análisis de datos.",
+      "eligibleLevels": [
+        "Bachelor",
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Peru"
+      ],
+      "tags": [
+        "Machine Learning",
+        "Python"
+      ],
+      "requiredSkills": [
+        "Python"
+      ],
+      "optionalSkills": [
+        "TensorFlow",
+        "Pandas"
+      ],
+      "fieldOfStudy": "AI / Data Science",
+      "modality": "Remoto",
+      "language": "Inglés",
+      "fundingAmount": "600",
+      "currency": "USD",
+      "popularityScore": "90",
+      "deadline": "2025-03-15",
+      "salaryRange": {
+        "min": "300",
+        "max": "500"
+      }
+    },
+    {
+      "type": "EMPLOYMENT",
+      "title": "Junior DevOps Engineer",
+      "organization": "CloudHive",
+      "url": "https://example.com/junior-devops",
+      "description": "Puesto inicial para manejar pipelines, contenedores y automatización.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "México"
+      ],
+      "tags": [
+        "DevOps",
+        "CI/CD",
+        "Docker"
+      ],
+      "requiredSkills": [
+        "Linux",
+        "Docker"
+      ],
+      "optionalSkills": [
+        "AWS"
+      ],
+      "fieldOfStudy": "Software Engineering",
+      "modality": "Remoto",
+      "language": "Inglés",
+      "fundingAmount": null,
+      "currency": null,
+      "popularityScore": "82",
+      "deadline": null,
+      "salaryRange": {
+        "min": "1800",
+        "max": "2600"
+      }
+    },
+    {
+      "type": "SCHOLARSHIP",
+      "title": "Beca Jóvenes Científicos",
+      "organization": "Instituto de Investigación Global",
+      "url": "https://example.com/beca-cientificos",
+      "description": "Apoyo económico para proyectos científicos en etapa inicial.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Latinoamérica"
+      ],
+      "tags": [
+        "Science",
+        "Research Grant"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Experiencia en laboratorio"
+      ],
+      "fieldOfStudy": "Ciencia",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "4500",
+      "currency": "USD",
+      "popularityScore": "79",
+      "deadline": "2025-08-12",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "EMPLOYMENT",
+      "title": "Soporte Técnico Nivel 1",
+      "organization": "TechHelp Solutions",
+      "url": "https://example.com/soporte-n1",
+      "description": "Soporte técnico a usuarios finales para resolver problemas de hardware y software.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru"
+      ],
+      "tags": [
+        "Tech Support",
+        "Hardware",
+        "Customer Service"
+      ],
+      "requiredSkills": [
+        "Atención al cliente"
+      ],
+      "optionalSkills": [
+        "Networking básico"
+      ],
+      "fieldOfStudy": "Tecnologías de la Información",
+      "modality": "Presencial",
+      "language": "Español",
+      "fundingAmount": null,
+      "currency": null,
+      "popularityScore": "65",
+      "deadline": null,
+      "salaryRange": {
+        "min": "1000",
+        "max": "1500"
+      }
+    },
+    {
+      "type": "SCHOLARSHIP",
+      "title": "Beca de Innovación Tecnológica Europa 2025",
+      "organization": "TechForward Europe",
+      "url": "https://example.com/beca-innovacion-eu",
+      "description": "Financiamiento para proyectos tecnológicos orientados a impacto social.",
+      "eligibleLevels": [
+        "Bachelor",
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "Colombia",
+        "Chile"
+      ],
+      "tags": [
+        "Innovation",
+        "Tech",
+        "Scholarship"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Inglés B2"
+      ],
+      "fieldOfStudy": "Ingeniería / Tecnología",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "8000",
+      "currency": "EUR",
+      "popularityScore": "91",
+      "deadline": "2025-06-30",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "INTERNSHIP",
+      "title": "Pasantía en Ciberseguridad",
+      "organization": "SecureNet Labs",
+      "url": "https://example.com/intern-ciberseguridad",
+      "description": "Entrenamiento práctico en análisis de vulnerabilidades y seguridad ofensiva.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Latinoamérica"
+      ],
+      "tags": [
+        "Cybersecurity",
+        "Internship"
+      ],
+      "requiredSkills": [
+        "Linux básico"
+      ],
+      "optionalSkills": [
+        "Python"
+      ],
+      "fieldOfStudy": "Computer Science",
+      "modality": "Remoto",
+      "language": "Español",
+      "fundingAmount": "300",
+      "currency": "USD",
+      "popularityScore": "86",
+      "deadline": "2025-04-12",
+      "salaryRange": {
+        "min": "150",
+        "max": "350"
+      }
+    },
+    {
+      "type": "EXCHANGE_PROGRAM",
+      "title": "Intercambio Académico Europa del Norte",
+      "organization": "Nordic Global Network",
+      "url": "https://example.com/intercambio-nordico",
+      "description": "Programa de estudios en Suecia, Noruega o Finlandia.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Latinoamérica"
+      ],
+      "tags": [
+        "Exchange",
+        "Nordic",
+        "International"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Inglés B2"
+      ],
+      "fieldOfStudy": "Todas las áreas",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "5500",
+      "currency": "EUR",
+      "popularityScore": "94",
+      "deadline": "2025-05-20",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "EMPLOYMENT",
+      "title": "Backend Developer Trainee",
+      "organization": "CodeStream Inc.",
+      "url": "https://example.com/backend-trainee",
+      "description": "Programa de entrenamiento para desarrollo backend en Node.js y PostgreSQL.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru"
+      ],
+      "tags": [
+        "Backend",
+        "Node.js",
+        "Training"
+      ],
+      "requiredSkills": [
+        "JavaScript"
+      ],
+      "optionalSkills": [
+        "SQL"
+      ],
+      "fieldOfStudy": "Software Engineering",
+      "modality": "Remoto",
+      "language": "Español",
+      "fundingAmount": null,
+      "currency": null,
+      "popularityScore": "78",
+      "deadline": null,
+      "salaryRange": {
+        "min": "1500",
+        "max": "2200"
+      }
+    },
+    {
+      "type": "SCHOLARSHIP",
+      "title": "Beca Artes Digitales y Multimedia",
+      "organization": "Creative Arts Foundation",
+      "url": "https://example.com/beca-artes-digitales",
+      "description": "Financiamiento para estudiantes interesados en animación, diseño 3D y multimedia.",
+      "eligibleLevels": [
+        "Bachelor",
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "México"
+      ],
+      "tags": [
+        "Arts",
+        "Multimedia",
+        "Scholarship"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Portafolio creativo"
+      ],
+      "fieldOfStudy": "Artes Digitales",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "7000",
+      "currency": "USD",
+      "popularityScore": "88",
+      "deadline": "2025-07-21",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "INTERNSHIP",
+      "title": "Pasantía en Marketing Digital",
+      "organization": "BrightMedia",
+      "url": "https://example.com/intern-marketing",
+      "description": "Entrenamiento en SEO, SEM, redes sociales y campañas digitales.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "Colombia"
+      ],
+      "tags": [
+        "Marketing",
+        "SEO",
+        "Internship"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Google Analytics"
+      ],
+      "fieldOfStudy": "Marketing / Comunicaciones",
+      "modality": "Híbrido",
+      "language": "Español",
+      "fundingAmount": "200",
+      "currency": "USD",
+      "popularityScore": "72",
+      "deadline": "2025-03-10",
+      "salaryRange": {
+        "min": "100",
+        "max": "250"
+      }
+    },
+    {
+      "type": "EXCHANGE_PROGRAM",
+      "title": "Programa Internacional en Emprendimiento",
+      "organization": "StartUp Global Academy",
+      "url": "https://example.com/exchange-emprendimiento",
+      "description": "Semestre centrado en emprendimiento, innovación y creación de startups.",
+      "eligibleLevels": [
+        "Bachelor",
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Latinoamérica"
+      ],
+      "tags": [
+        "Entrepreneurship",
+        "Innovation",
+        "Exchange"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Pitching"
+      ],
+      "fieldOfStudy": "Negocios / Tecnología",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "4800",
+      "currency": "USD",
+      "popularityScore": "87",
+      "deadline": "2025-04-08",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "EMPLOYMENT",
+      "title": "Junior Data Analyst",
+      "organization": "Insight Analytics Group",
+      "url": "https://example.com/junior-data-analyst",
+      "description": "Análisis de datos, dashboards y limpieza de información.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "Chile"
+      ],
+      "tags": [
+        "Data",
+        "Analytics",
+        "Junior"
+      ],
+      "requiredSkills": [
+        "Excel",
+        "SQL"
+      ],
+      "optionalSkills": [
+        "Python"
+      ],
+      "fieldOfStudy": "Data Science",
+      "modality": "Remoto",
+      "language": "Español",
+      "fundingAmount": null,
+      "currency": null,
+      "popularityScore": "80",
+      "deadline": null,
+      "salaryRange": {
+        "min": "1600",
+        "max": "2400"
+      }
+    },
+    {
+      "type": "SCHOLARSHIP",
+      "title": "Beca Ciencias Ambientales",
+      "organization": "GreenWorld Foundation",
+      "url": "https://example.com/beca-ambiental",
+      "description": "Apoyo económico para proyectos de conservación y sostenibilidad.",
+      "eligibleLevels": [
+        "Master"
+      ],
+      "eligibleCountries": [
+        "Latinoamérica"
+      ],
+      "tags": [
+        "Environment",
+        "Sustainability",
+        "Scholarship"
+      ],
+      "requiredSkills": [],
+      "optionalSkills": [
+        "Experiencia previa en campo"
+      ],
+      "fieldOfStudy": "Ciencias Ambientales",
+      "modality": "Presencial",
+      "language": "Inglés",
+      "fundingAmount": "5000",
+      "currency": "USD",
+      "popularityScore": "83",
+      "deadline": "2025-09-05",
+      "salaryRange": {
+        "min": "0",
+        "max": "0"
+      }
+    },
+    {
+      "type": "EMPLOYMENT",
+      "title": "IT Support Junior",
+      "organization": "Global IT Partners",
+      "url": "https://example.com/it-support-junior",
+      "description": "Soporte técnico para infraestructura básica y resolución de incidencias.",
+      "eligibleLevels": [
+        "Bachelor"
+      ],
+      "eligibleCountries": [
+        "Peru",
+        "Ecuador"
+      ],
+      "tags": [
+        "IT Support",
+        "Infrastructure"
+      ],
+      "requiredSkills": [
+        "Atención al cliente"
+      ],
+      "optionalSkills": [
+        "Windows Server"
+      ],
+      "fieldOfStudy": "Sistemas / Informática",
+      "modality": "Presencial",
+      "language": "Español",
+      "fundingAmount": null,
+      "currency": null,
+      "popularityScore": "67",
+      "deadline": null,
+      "salaryRange": {
+        "min": "1100",
+        "max": "1600"
+      }
+    }
+  ]
+}
