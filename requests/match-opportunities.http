@@ -1,0 +1,147 @@
+### Match opportunities for a CV
+POST http://localhost:3000/api/match/users/123/cvs/456
+Content-Type: application/json
+
+{
+  "top_k": 5,
+  "cv": {
+    "summary": "Software Engineer with experience in backend development and APIs",
+    "experience_text": "3 years working with Node.js, Next.js, Prisma and PostgreSQL. Built matching engines and REST APIs.",
+    "skills": [
+      "Node.js",
+      "Next.js",
+      "Prisma",
+      "PostgreSQL",
+      "TypeScript"
+    ],
+    "countries": ["Peru"],
+    "languages": ["Spanish", "English"]
+  }
+}
+
+
+### Match – Junior Developer (minimal CV)
+POST http://localhost:3000/api/match/users/124/cvs/457
+Content-Type: application/json
+
+{
+  "top_k": 3,
+  "cv": {
+    "summary": "Junior software developer",
+    "experience_text": "Internship building small web applications using JavaScript and React.",
+    "skills": ["JavaScript", "React"]
+  }
+}
+
+### Match – Data / AI profile
+POST http://localhost:3000/api/match/users/125/cvs/458
+Content-Type: application/json
+
+{
+  "top_k": 5,
+  "cv": {
+    "summary": "Data scientist focused on machine learning and NLP",
+    "experience_text": "Worked on ML models using Python, scikit-learn, and transformers for text similarity.",
+    "skills": [
+      "Python",
+      "Machine Learning",
+      "NLP",
+      "scikit-learn",
+      "Transformers"
+    ],
+    "countries": ["Peru", "Chile"],
+    "languages": ["English"]
+  }
+}
+
+
+### Match – Non-technical (Humanities / Scholarships)
+POST http://localhost:3000/api/match/users/126/cvs/459
+Content-Type: application/json
+
+{
+  "top_k": 5,
+  "cv": {
+    "summary": "Humanities student interested in international scholarships",
+    "experience_text": "Participated in research projects related to history and cultural studies.",
+    "skills": [
+      "Academic Research",
+      "Writing",
+      "Critical Thinking"
+    ],
+    "countries": ["Peru"],
+    "languages": ["Spanish"]
+  }
+}
+
+### Match – Marketing / Business profile
+POST http://localhost:3000/api/match/users/127/cvs/460
+Content-Type: application/json
+
+{
+  "top_k": 4,
+  "cv": {
+    "summary": "Digital marketing specialist",
+    "experience_text": "Managed social media campaigns, SEO strategies, and Google Ads for small businesses.",
+    "skills": [
+      "Digital Marketing",
+      "SEO",
+      "Google Ads",
+      "Content Strategy"
+    ],
+    "languages": ["Spanish", "English"]
+  }
+}
+
+### Match – Very senior / broad experience
+POST http://localhost:3000/api/match/users/128/cvs/461
+Content-Type: application/json
+
+{
+  "top_k": 5,
+  "cv": {
+    "summary": "Senior software architect with 10+ years of experience",
+    "experience_text": "Designed scalable systems, led engineering teams, and defined backend architectures for high-traffic platforms.",
+    "skills": [
+      "System Design",
+      "Microservices",
+      "Node.js",
+      "AWS",
+      "PostgreSQL"
+    ],
+    "countries": ["Peru", "USA"],
+    "languages": ["English", "Spanish"]
+  }
+}
+
+### Match – Edge case (empty skills array)
+POST http://localhost:3000/api/match/users/129/cvs/462
+Content-Type: application/json
+
+{
+  "top_k": 5,
+  "cv": {
+    "summary": "Student exploring opportunities",
+    "experience_text": "Currently studying and exploring different fields.",
+    "skills": [],
+    "languages": ["Spanish"]
+  }
+}
+
+### Match – Different top_k (stress ranking)
+POST http://localhost:3000/api/match/users/130/cvs/463
+Content-Type: application/json
+
+{
+  "top_k": 10,
+  "cv": {
+    "summary": "Backend developer interested in scholarships and internships",
+    "experience_text": "Experience with REST APIs, databases, and cloud deployment.",
+    "skills": [
+      "Node.js",
+      "REST APIs",
+      "SQL",
+      "Docker"
+    ]
+  }
+}

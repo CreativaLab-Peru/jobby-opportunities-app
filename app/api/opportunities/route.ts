@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: Request) {
   try {
     const userID = request.headers.get('user-id');
-    
+
     if (!userID) {
       return NextResponse.json(
         { error: 'Usuario no autenticado' },
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-    
+
     // Filtros
     const types = searchParams.getAll('types').filter(t => t);
     const levels = searchParams.getAll('levels').filter(l => l);
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     // Construir objeto where dinámicamente
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
-      userId: userID
+      // userId: userID
     };
 
     // Filtros de arrays
@@ -96,11 +96,11 @@ export async function GET(request: Request) {
     // Construir orderBy dinámicamente
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orderBy: any = {};
-    
+
     // Mapeo de campos válidos para ordenar
     const validSortFields = ['createdAt', 'deadline', 'title', 'updatedAt'];
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
-    
+
     orderBy[sortField] = sortOrder === 'asc' ? 'asc' : 'desc';
 
     // Obtener oportunidades paginadas
@@ -133,7 +133,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const userID = request.headers.get('user-id');
-    
+
     if (!userID) {
         return NextResponse.json(
           { error: 'Usuario no encontrado' },
@@ -142,14 +142,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    
+
     console.log('Creando nueva oportunidad');
     console.log('Datos recibidos:', body);
-    
+
     // Preparar los datos con valores por defecto y conversiones necesarias
     const createData = {
       type: body.type,
-      title: body.title,
+      title: body.title + "(prueba)",
       organization: body.organization,
       url: body.url || null,
       description: body.description || null,
@@ -171,11 +171,11 @@ export async function POST(request: Request) {
         max: body.salaryRange.max ? parseFloat(body.salaryRange.max) : null,
       } : null
     };
-    
+
     const opportunity = await prisma.opportunity.create({
       data: createData
     });
-    
+
     console.log('Oportunidad creada exitosamente:', opportunity.id);
     return NextResponse.json(opportunity, { status: 201 });
   } catch (error) {
