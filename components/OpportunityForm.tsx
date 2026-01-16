@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Opportunity, OpportunityFormData  } from '../app/types/opportunity';
+import { Opportunity, OpportunityFormData  } from '@/app/types/opportunity';
 
 interface OpportunityFormProps {
   opportunity?: Opportunity;
@@ -10,19 +10,24 @@ interface OpportunityFormProps {
 
 // Opciones para los selects
 const OPPORTUNITY_TYPES = [
-  { value: 'scholarship', label: 'Beca' },
-  { value: 'internship', label: 'Pasantía' },
-  { value: 'job', label: 'Trabajo' },
-  { value: 'course', label: 'Curso' },
-  { value: 'competition', label: 'Competencia' }
+  { value: 'SCHOLARSHIP', label: 'Beca' },
+  { value: 'INTERNSHIP', label: 'Pasantía' },
+  { value: 'EXCHANGE_PROGRAM', label: 'Intercambio' },
+  { value: 'EMPLOYMENT', label: 'Empleo' },
+  { value: 'RESEARCH_FELLOWSHIP', label: 'Investigacion' },
+  { value: 'COMPETITION', label: 'Competencia' }
 ];
 
 const LEVELS = [
-  { value: 'high_school', label: 'Bachillerato' },
-  { value: 'bachelor', label: 'Licenciatura' },
-  { value: 'master', label: 'Maestría' },
-  { value: 'phd', label: 'Doctorado' },
-  { value: 'postdoc', label: 'Postdoctorado' }
+  { value: 'INTERN', label: 'Practicante' },
+  { value: 'JUNIOR', label: 'Junior' },
+  { value: 'MID', label: 'Medio' },
+  { value: 'SENIOR', label: 'Senior' },
+  { value: 'LEAD', label: 'Lider' },
+  { value: 'EXECUTIVE', label: 'Ejecutivo' },
+  { value: 'MASTER', label: 'Maestria' },
+  { value: 'PHD', label: 'Doctorado' },
+  { value: 'POSTDOC', label: 'Postdoctorado' }
 ];
 
 export default function OpportunityForm({ opportunity, onSubmit, onCancel }: OpportunityFormProps) {
@@ -92,7 +97,7 @@ export default function OpportunityForm({ opportunity, onSubmit, onCancel }: Opp
       {/* Información Básica */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Información Básica</h3>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -173,7 +178,7 @@ export default function OpportunityForm({ opportunity, onSubmit, onCancel }: Opp
       {/* Elegibilidad */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Requisitos de Elegibilidad</h3>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -220,7 +225,7 @@ export default function OpportunityForm({ opportunity, onSubmit, onCancel }: Opp
       {/* Habilidades y Detalles */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Habilidades y Detalles</h3>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -355,7 +360,7 @@ export default function OpportunityForm({ opportunity, onSubmit, onCancel }: Opp
       {/* Información Financiera */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Información Financiera</h3>
-        
+
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -392,8 +397,8 @@ export default function OpportunityForm({ opportunity, onSubmit, onCancel }: Opp
                 <input
                   type="number"
                   value={formData.salaryRange?.min || ''}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
                     salaryRange: { ...prev.salaryRange, min: e.target.value ? parseFloat(e.target.value) : undefined }
                   }))}
                   className="w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -402,8 +407,8 @@ export default function OpportunityForm({ opportunity, onSubmit, onCancel }: Opp
                 <input
                   type="number"
                   value={formData.salaryRange?.max || ''}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
                     salaryRange: { ...prev.salaryRange, max: e.target.value ? parseFloat(e.target.value) : undefined }
                   }))}
                   className="w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
