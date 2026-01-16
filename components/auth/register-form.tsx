@@ -36,8 +36,8 @@ export function RegisterForm() {
         return;
       }
 
-      // Si el registro es exitoso, forzar refresh y redirigir
-      window.location.href = '/dashboard';
+      // Si el registro es exitoso, redirigir al onboarding
+      window.location.href = '/onboarding';
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error en el registro');

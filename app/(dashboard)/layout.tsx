@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { AppSidebar } from "@/components/ui/app-sidebar";
@@ -15,14 +15,28 @@ export default function DashboardLayout({
 }) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/login");
+      return;
+    }
+    
+    if (session?.user?.id) {
+      // Verificar onboarding en el servidor
+      fetch('/api/user/check-onboarding')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.onboardingCompleted) {
+            router.push("/onboarding");
+          }
+        })
+        .finally(() => setCheckingOnboarding(false));
     }
   }, [session, isPending, router]);
 
-  if (isPending) {
+  if (isPending || checkingOnboarding) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="space-y-4 w-full max-w-md px-4">
