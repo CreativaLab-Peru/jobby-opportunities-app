@@ -56,7 +56,8 @@ model Opportunity {
   description  String?
   url          String?
   language     String?         @default("EN") // ISO 639-1
-  fieldOfStudy String?
+  ubication    String? // Ciudad, País de la oportunidad
+  fieldOfStudy String? // Area
 
   // ---- Clasificación Estricta ----
   modality Modality          @default(ON_SITE)
@@ -65,7 +66,7 @@ model Opportunity {
   // ---- Campos de Matching Rápido ----
   eligibleLevels    String[] // ["JUNIOR", "MID"]
   eligibleCountries String[] // ["PE", "US"]
-  requiredSkills    String[]
+  requiredSkills    String[] // ["nextjs", "prisma"]
   optionalSkills    String[]
 
   // ---- Finanzas Denormalizadas ----
@@ -87,6 +88,23 @@ model Opportunity {
   @@index([eligibleCountries])
   @@index([modality])
   @@map("opportunities")
+}
+
+model Skill {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  key       String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("skills")
+}
+
+model Area {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("areas")
 }
 
 enum Modality {

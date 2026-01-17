@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import { generateSearchVector } from "@/lib/matching/utils";
 import { prisma } from '@/lib/prisma';
 import {getCanonicalSkill} from "@/lib/matching/skills-utils";
-import {Prisma} from ".prisma/client";
-import OpportunityCreateArgs = Prisma.OpportunityCreateArgs;
+import {getSession} from "@/features/auth/actions/get-session";
 
 // GET - Obtener oportunidades del usuario actual con filtros y paginación
 export async function GET(request: Request) {
@@ -135,10 +134,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const userID = request.headers.get('user-id');
-    if (!userID) {
+    const session = await getSession();
+    if (!session.success || !session.user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
+
+    const userId = session.user.id as string;
 
     const body = await request.json();
 
@@ -200,7 +201,7 @@ export async function POST(request: Request) {
 
         deadline: body.deadline ? new Date(body.deadline) : null,
         popularityScore: body.popularityScore ? parseInt(body.popularityScore) : 0,
-        userId: userID,
+        userId,
       }
     });
 

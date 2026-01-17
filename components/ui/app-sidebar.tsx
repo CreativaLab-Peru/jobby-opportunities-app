@@ -24,7 +24,7 @@ import {
 
 const menuItems = [
   { title: "Dashboard", href: "/dashboard", icon: Home },
-  { title: "Oportunidades", href: "/opportunities/new", icon: Briefcase },
+  { title: "Oportunidades", href: "/opportunities", icon: Briefcase },
 ] as const;
 
 export function AppSidebar() {

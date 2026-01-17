@@ -113,6 +113,7 @@ export default function EditOpportunityPage({ params }: EditOpportunityPageProps
               opportunity={opportunity}
               onSubmit={handleUpdate}
               onCancel={() => router.push('/dashboard')}
+              skillsOptions={[]}
             />
           </div>
         </div>

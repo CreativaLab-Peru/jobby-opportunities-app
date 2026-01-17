@@ -1,43 +1,35 @@
 'use client';
-import { useState } from 'react';
-import {LEVELS, MODALITIES, OPPORTUNITY_TYPES} from "@/consts";
+
+import { useState, useEffect } from 'react';
+import { Search, Filter, ChevronDown, X } from 'lucide-react';
+import { LEVELS, MODALITIES, OPPORTUNITY_TYPES } from "@/consts";
+import { GetOpportunitiesParams } from "@/features/opportunities/actions/get-opportunities";
+import { Button } from '@/components/ui/button';
 
 interface FilterPanelProps {
-  onFilterChange: (filters: Filters) => void;
+  initialFilters: GetOpportunitiesParams;
+  onFilterChange: (filters: Partial<GetOpportunitiesParams>) => void;
   activeFiltersCount: number;
 }
 
-export interface Filters {
-  search: string | null;
-  types: string[];
-  levels: string[];
-  countries: string[];
-  modality: string | null;
-  language: string | null;
-  deadlineFrom: string | null;
-  deadlineTo: string | null;
-  salaryMin: string | null;
-  salaryMax: string | null;
-}
-
-export default function FilterPanel({ onFilterChange, activeFiltersCount }: FilterPanelProps) {
+export default function FilterPanel({
+                                      initialFilters,
+                                      onFilterChange,
+                                      activeFiltersCount
+                                    }: FilterPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filters, setFilters] = useState<Filters>({
-    search: null,
-    types: [],
-    levels: [],
-    countries: [],
-    modality: null,
-    language: null,
-    deadlineFrom: null,
-    deadlineTo: null,
-    salaryMin: null,
-    salaryMax: null
-  });
+
+  // Sincronizamos el estado local con los filtros que vienen de la URL (SSR)
+  const [localFilters, setLocalFilters] = useState<GetOpportunitiesParams>(initialFilters);
+
+  // Cada vez que los filtros de la URL cambian (ej. botón atrás), actualizamos el panel
+  useEffect(() => {
+    setLocalFilters(initialFilters);
+  }, [initialFilters]);
 
   const handleCheckboxChange = (field: 'types' | 'levels', value: string) => {
-    setFilters(prev => {
-      const current = prev[field];
+    setLocalFilters(prev => {
+      const current = (prev[field] as string[]) || [];
       const updated = current.includes(value)
         ? current.filter(item => item !== value)
         : [...current, value];
@@ -45,120 +37,110 @@ export default function FilterPanel({ onFilterChange, activeFiltersCount }: Filt
     });
   };
 
-  const handleCountriesChange = (value: string) => {
-    const countriesArray = value ? value.split(',').map(c => c.trim()).filter(c => c) : [];
-    setFilters(prev => ({ ...prev, countries: countriesArray }));
-  };
-
   const handleApplyFilters = () => {
-    onFilterChange(filters);
+    onFilterChange(localFilters);
+    setIsOpen(false);
   };
 
   const handleClearFilters = () => {
-    const emptyFilters: Filters = {
-      search: null,
+    const emptyFilters: GetOpportunitiesParams = {
+      search: undefined,
       types: [],
       levels: [],
       countries: [],
-      modality: null,
-      language: null,
-      deadlineFrom: null,
-      deadlineTo: null,
-      salaryMin: null,
-      salaryMax: null
+      modality: undefined,
     };
-    setFilters(emptyFilters);
+    setLocalFilters(emptyFilters);
     onFilterChange(emptyFilters);
+    setIsOpen(false);
   };
 
   return (
-    <div className="mb-4">
-      {/* Botón toggle de filtros */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 shadow-sm"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        <span className="font-medium">Filtros</span>
-        {activeFiltersCount > 0 && (
-          <span className="px-2 py-0.5 text-xs font-semibold text-white bg-indigo-600 rounded-full">
-            {activeFiltersCount}
-          </span>
-        )}
-        <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <div className="w-full">
+      <div className="flex items-center gap-2 mb-4">
+        <Button
+          variant="outline"
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative flex items-center gap-2"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+          <Filter className="w-4 h-4" />
+          <span>Filtros</span>
+          {activeFiltersCount > 0 && (
+            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
+              {activeFiltersCount}
+            </span>
+          )}
+          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </Button>
 
-      {/* Panel de filtros */}
+        {activeFiltersCount > 0 && (
+          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="text-muted-foreground h-8">
+            <X className="w-3 h-3 mr-1" /> Limpiar
+          </Button>
+        )}
+      </div>
+
       {isOpen && (
-        <div className="mt-3 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-          {/* Barra de búsqueda - Ocupa todo el ancho */}
+        <div className="p-6 bg-white border rounded-xl shadow-sm animate-in fade-in zoom-in duration-200">
+          {/* Búsqueda Principal */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              🔍 Buscar por título u organización
-            </label>
-            <input
-              type="text"
-              placeholder="Ej: becas google, harvard..."
-              value={filters.search || ''}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value || null }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            />
+            <label className="block text-sm font-semibold mb-2">Buscar</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Título, empresa o palabras clave..."
+                value={localFilters.search || ''}
+                onChange={(e) => setLocalFilters(prev => ({ ...prev, search: e.target.value || undefined }))}
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-black outline-none transition-all"
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            {/* Tipo de Oportunidad */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Oportunidad</label>
-              <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Tipo */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold border-b pb-1">Tipo</h4>
+              <div className="grid gap-2">
                 {OPPORTUNITY_TYPES.map(type => (
-                  <label key={type.value} className="flex items-center">
+                  <label key={type.value} className="flex items-center gap-2 cursor-pointer group">
                     <input
                       type="checkbox"
-                      checked={filters.types.includes(type.value)}
+                      checked={(localFilters.types || []).includes(type.value)}
                       onChange={() => handleCheckboxChange('types', type.value)}
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="rounded border-gray-300 text-black focus:ring-black"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{type.label}</span>
+                    <span className="text-sm group-hover:text-black transition-colors">{type.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Nivel Educativo */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Nivel Educativo</label>
-              <div className="space-y-2">
+            {/* Niveles */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold border-b pb-1">Nivel</h4>
+              <div className="grid gap-2">
                 {LEVELS.map(level => (
-                  <label key={level.value} className="flex items-center">
+                  <label key={level.value} className="flex items-center gap-2 cursor-pointer group">
                     <input
                       type="checkbox"
-                      checked={filters.levels.includes(level.value)}
+                      checked={(localFilters.levels || []).includes(level.value)}
                       onChange={() => handleCheckboxChange('levels', level.value)}
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="rounded border-gray-300 text-black focus:ring-black"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{level.label}</span>
+                    <span className="text-sm group-hover:text-black transition-colors">{level.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             {/* Modalidad */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Modalidad</label>
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold border-b pb-1">Modalidad</h4>
               <select
-                value={filters.modality || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, modality: e.target.value || null }))}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                value={localFilters.modality || ''}
+                onChange={(e) => setLocalFilters(prev => ({ ...prev, modality: e.target.value || undefined }))}
+                className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-black"
               >
                 <option value="">Todas</option>
                 {MODALITIES.map(mod => (
@@ -167,88 +149,30 @@ export default function FilterPanel({ onFilterChange, activeFiltersCount }: Filt
               </select>
             </div>
 
-            {/* Países */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Países</label>
+            {/* Países (Simplificado para el ejemplo) */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold border-b pb-1">Ubicación</h4>
               <input
                 type="text"
-                value={filters.countries.join(', ')}
-                onChange={(e) => handleCountriesChange(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="Ej: Perú, Chile, Colombia"
+                placeholder="Ej: México, España..."
+                value={(localFilters.countries || []).join(', ')}
+                onChange={(e) => setLocalFilters(prev => ({
+                  ...prev,
+                  countries: e.target.value ? e.target.value.split(',').map(s => s.trim()) : []
+                }))}
+                className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-black"
               />
             </div>
-
-            {/* Idioma */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Idioma</label>
-              <input
-                type="text"
-                value={filters.language || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, language: e.target.value || null }))}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="Ej: Español, Inglés"
-              />
-            </div>
-
-            {/* Fecha Límite */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Fecha Límite</label>
-              <div className="space-y-2">
-                <input
-                  type="date"
-                  value={filters.deadlineFrom || ''}
-                  onChange={(e) => setFilters(prev => ({ ...prev, deadlineFrom: e.target.value || null }))}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="Desde"
-                />
-                <input
-                  type="date"
-                  value={filters.deadlineTo || ''}
-                  onChange={(e) => setFilters(prev => ({ ...prev, deadlineTo: e.target.value || null }))}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="Hasta"
-                />
-              </div>
-            </div>
-
-            {/* Rango Salarial */}
-            <div className="md:col-span-2 lg:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Rango Salarial</label>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="number"
-                  value={filters.salaryMin || ''}
-                  onChange={(e) => setFilters(prev => ({ ...prev, salaryMin: e.target.value || null }))}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="Mínimo"
-                />
-                <input
-                  type="number"
-                  value={filters.salaryMax || ''}
-                  onChange={(e) => setFilters(prev => ({ ...prev, salaryMax: e.target.value || null }))}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="Máximo"
-                />
-              </div>
-            </div>
-
           </div>
 
-          {/* Botones */}
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-            <button
-              onClick={handleClearFilters}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Limpiar
-            </button>
-            <button
-              onClick={handleApplyFilters}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-            >
+          {/* Acciones del Panel */}
+          <div className="flex justify-end items-center gap-3 mt-8 pt-4 border-t">
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleApplyFilters} className="bg-black text-white hover:bg-gray-800">
               Aplicar Filtros
-            </button>
+            </Button>
           </div>
         </div>
       )}

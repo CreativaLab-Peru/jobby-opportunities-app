@@ -1,4 +1,3 @@
-// lib/validations/opportunity.ts
 import { z } from 'zod';
 
 export const opportunitySchema = z.object({

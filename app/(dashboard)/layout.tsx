@@ -45,7 +45,7 @@ export default function DashboardLayout({
         <div className="flex h-12 items-center justify-end px-4 border-b bg-background shrink-0">
           <UserNav user={{ name: session.user.name, email: session.user.email }} />
         </div>
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto p-2 md:p-6">
           {children}
         </div>
       </SidebarInset>

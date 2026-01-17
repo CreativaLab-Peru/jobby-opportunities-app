@@ -1,9 +1,9 @@
 'use client';
-import { OpportunityListItem } from '@/app/types/opportunity';
+import {Opportunity} from "@prisma/client";
 
 interface OpportunityListProps {
-  opportunities: OpportunityListItem[];
-  onEdit: (opportunity: OpportunityListItem) => void;
+  opportunities: Opportunity[];
+  onEdit: (opportunity: Opportunity) => void;
   onDelete: (id: string) => void;
 }
 
@@ -38,10 +38,10 @@ export default function OpportunityList({ opportunities, onEdit, onDelete }: Opp
                   <div className="text-sm font-medium text-gray-900">{opportunity.title}</div>
                   {opportunity.url && (
                     <div className="text-sm text-gray-500">
-                      <a 
-                        href={opportunity.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
+                      <a
+                        href={opportunity.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         Ver oportunidad
@@ -58,7 +58,7 @@ export default function OpportunityList({ opportunities, onEdit, onDelete }: Opp
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {opportunity.deadline 
+                  {opportunity.deadline
                     ? new Date(opportunity.deadline).toLocaleDateString('es-ES')
                     : 'No especificada'
                   }
@@ -81,7 +81,7 @@ export default function OpportunityList({ opportunities, onEdit, onDelete }: Opp
             ))}
           </tbody>
         </table>
-        
+
         {opportunities.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             No se encontraron oportunidades
