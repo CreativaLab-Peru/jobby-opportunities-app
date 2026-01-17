@@ -1,9 +1,8 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/lib/auth-client';
-import OpportunityForm from '@/components/OpportunityForm';
-import { OpportunityFormData } from '../../../types/opportunity';
-import Link from 'next/link';
+import OpportunityForm from '@/components/opportunity-form';
+import { OpportunityFormData } from '@/app/types/opportunity';
 import { useEffect } from 'react';
 
 export default function NewOpportunityPage() {
@@ -19,10 +18,10 @@ export default function NewOpportunityPage() {
   const handleCreate = async (formData: OpportunityFormData) => {
     try {
       console.log('Enviando datos:', formData);
-      
+
       const response = await fetch('/api/opportunities', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'user-id': session?.user?.id || ''
         },
@@ -36,7 +35,7 @@ export default function NewOpportunityPage() {
 
       const result = await response.json();
       console.log('Oportunidad creada:', result);
-      
+
       router.push('/dashboard');
     } catch (error) {
       console.error('Error completo:', error);
@@ -59,27 +58,12 @@ export default function NewOpportunityPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-semibold hover:text-indigo-600">
-                ← Volver al Dashboard
-              </Link>
-            </div>
-            <div className="flex items-center">
-              <span className="text-gray-700">{session?.user?.name}</span>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
             Nueva Oportunidad
           </h1>
-          
+
           <div className="bg-white shadow rounded-lg p-6">
             <OpportunityForm
               onSubmit={handleCreate}

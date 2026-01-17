@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/lib/auth-client';
-import OpportunityForm from '@/components/OpportunityForm';
+import OpportunityForm from '@/components/opportunity-form';
 import { Opportunity, OpportunityFormData } from '../../../../types/opportunity';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -87,27 +87,27 @@ export default function EditOpportunityPage({ params }: EditOpportunityPageProps
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-semibold hover:text-indigo-600">
-                ← Volver al Dashboard
-              </Link>
-            </div>
-            <div className="flex items-center">
-              <span className="text-gray-700">{session?.user?.name}</span>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/*<nav className="bg-white shadow">*/}
+      {/*  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">*/}
+      {/*    <div className="flex justify-between h-16">*/}
+      {/*      <div className="flex items-center">*/}
+      {/*        <Link href="/dashboard" className="text-xl font-semibold hover:text-indigo-600">*/}
+      {/*          ← Volver al Dashboard*/}
+      {/*        </Link>*/}
+      {/*      </div>*/}
+      {/*      <div className="flex items-center">*/}
+      {/*        <span className="text-gray-700">{session?.user?.name}</span>*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*</nav>*/}
 
-      <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
             Editar Oportunidad
           </h1>
-          
+
           <div className="bg-white shadow rounded-lg p-6">
             <OpportunityForm
               opportunity={opportunity}

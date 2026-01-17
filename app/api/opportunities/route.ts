@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { generateSearchVector } from "@/lib/matching/utils";
 import { prisma } from '@/lib/prisma';
 import {getCanonicalSkill} from "@/lib/matching/skills-utils";
+import {Prisma} from ".prisma/client";
+import OpportunityCreateArgs = Prisma.OpportunityCreateArgs;
 
 // GET - Obtener oportunidades del usuario actual con filtros y paginación
 export async function GET(request: Request) {
@@ -162,50 +164,44 @@ export async function POST(request: Request) {
     );
 
     // 2. Preparación de la data para MongoDB
-    const createData = {
-      type: body.type,
-      title: body.title,
-      organization: body.organization,
-      url: body.url || null,
-      description: body.description,
-      language: body.language || "ES",
-
-      // Enums y Clasificación
-      modality: body.modality || "ON_SITE",
-      status: "ACTIVE",
-
-      // Arrays normalizados para evitar fallos en el matching
-      eligibleLevels: (body.eligibleLevels || []).map((l: string) => l.toUpperCase()),
-      eligibleCountries: (body.eligibleCountries || []).map((c: string) => c.toUpperCase()),
-      requiredSkills: (body.requiredSkills || []).map(getCanonicalSkill),
-      optionalSkills: (body.optionalSkills || []).map(getCanonicalSkill),
-
-      fieldOfStudy: body.fieldOfStudy || null,
-
-      // Salarios (Doble entrada: para filtro rápido y para objeto embebido)
-      minSalary: body.salaryRange?.min ? parseFloat(body.salaryRange.min) : null,
-      maxSalary: body.salaryRange?.max ? parseFloat(body.salaryRange.max) : null,
-      salaryRange: body.salaryRange ? {
-        min: body.salaryRange.min ? parseFloat(body.salaryRange.min) : null,
-        max: body.salaryRange.max ? parseFloat(body.salaryRange.max) : null,
-      } : null,
-      currency: body.currency || "USD",
-
-      // Metadata de búsqueda (Optimiza el embedding)
-      searchVector: generateSearchVector({
-        title: body.title,
-        description: body.description,
-        organization: body.organization,
-        skills: normalizedSkills
-      }),
-
-      deadline: body.deadline ? new Date(body.deadline) : null,
-      popularityScore: body.popularityScore ? parseInt(body.popularityScore) : 0,
-      userId: userID,
-    };
-
     const opportunity = await prisma.opportunity.create({
-      data: createData
+      data: {
+        type: body.type,
+        title: body.title,
+        organization: body.organization,
+        url: body.url || "",
+        description: body.description,
+        language: body.language || "ES",
+
+        // Enums y Clasificación
+        modality: body.modality || "ON_SITE",
+        status: "ACTIVE",
+
+        // Arrays normalizados para evitar fallos en el matching
+        eligibleLevels: (body.eligibleLevels || []).map((l: string) => l.toUpperCase()),
+        eligibleCountries: (body.eligibleCountries || []).map((c: string) => c.toUpperCase()),
+        requiredSkills: (body.requiredSkills || []).map(getCanonicalSkill),
+        optionalSkills: (body.optionalSkills || []).map(getCanonicalSkill),
+
+        fieldOfStudy: body.fieldOfStudy || null,
+
+        // Salarios (Doble entrada: para filtro rápido y para objeto embebido)
+        minSalary: body.salaryRange?.min ? parseFloat(body.salaryRange.min) : null,
+        maxSalary: body.salaryRange?.max ? parseFloat(body.salaryRange.max) : null,
+        currency: body.currency || "USD",
+
+        // Metadata de búsqueda (Optimiza el embedding)
+        searchVector: generateSearchVector({
+          title: body.title,
+          description: body.description,
+          organization: body.organization,
+          skills: normalizedSkills
+        }),
+
+        deadline: body.deadline ? new Date(body.deadline) : null,
+        popularityScore: body.popularityScore ? parseInt(body.popularityScore) : 0,
+        userId: userID,
+      }
     });
 
     return NextResponse.json(opportunity, { status: 201 });

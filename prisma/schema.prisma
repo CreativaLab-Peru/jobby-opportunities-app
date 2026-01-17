@@ -54,6 +54,9 @@ model Opportunity {
   title        String
   organization String?
   description  String?
+  url          String?
+  language     String?         @default("EN") // ISO 639-1
+  fieldOfStudy String?
 
   // ---- Clasificación Estricta ----
   modality Modality          @default(ON_SITE)
@@ -63,6 +66,7 @@ model Opportunity {
   eligibleLevels    String[] // ["JUNIOR", "MID"]
   eligibleCountries String[] // ["PE", "US"]
   requiredSkills    String[]
+  optionalSkills    String[]
 
   // ---- Finanzas Denormalizadas ----
   minSalary Float?
@@ -70,7 +74,8 @@ model Opportunity {
   currency  String? @default("USD")
 
   // ---- Metadata de búsqueda ----
-  searchVector String? // Consolidado de title + description para IA
+  searchVector    String? // Consolidado de title + description para IA
+  popularityScore Int     @default(0)
 
   deadline  DateTime?
   createdAt DateTime  @default(now())

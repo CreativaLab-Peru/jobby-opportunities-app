@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import {LEVELS, MODALITIES, OPPORTUNITY_TYPES} from "@/consts";
 
 interface FilterPanelProps {
   onFilterChange: (filters: Filters) => void;
@@ -18,28 +19,6 @@ export interface Filters {
   salaryMin: string | null;
   salaryMax: string | null;
 }
-
-const OPPORTUNITY_TYPES = [
-  { value: 'scholarship', label: 'Beca' },
-  { value: 'internship', label: 'Pasantía' },
-  { value: 'job', label: 'Trabajo' },
-  { value: 'course', label: 'Curso' },
-  { value: 'competition', label: 'Competencia' }
-];
-
-const LEVELS = [
-  { value: 'high_school', label: 'Bachillerato' },
-  { value: 'bachelor', label: 'Licenciatura' },
-  { value: 'master', label: 'Maestría' },
-  { value: 'phd', label: 'Doctorado' },
-  { value: 'postdoc', label: 'Postdoctorado' }
-];
-
-const MODALITIES = [
-  { value: 'presencial', label: 'Presencial' },
-  { value: 'remoto', label: 'Remoto' },
-  { value: 'híbrido', label: 'Híbrido' }
-];
 
 export default function FilterPanel({ onFilterChange, activeFiltersCount }: FilterPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -108,10 +87,10 @@ export default function FilterPanel({ onFilterChange, activeFiltersCount }: Filt
             {activeFiltersCount}
           </span>
         )}
-        <svg 
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -136,7 +115,7 @@ export default function FilterPanel({ onFilterChange, activeFiltersCount }: Filt
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
+
             {/* Tipo de Oportunidad */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Oportunidad</label>
