@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCanonicalSkill } from "@/lib/matching/skills-utils";
 
-export async function createSkillAction(name: string) {
+export async function createSkillByNameAction(name: string) {
   if (!name || name.trim().length < 2) {
     return { success: false, error: "El nombre es demasiado corto" };
   }

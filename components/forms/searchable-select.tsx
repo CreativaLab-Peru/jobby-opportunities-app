@@ -1,6 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+'use client';
+
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Search, X, Check } from "lucide-react";
+import { ChevronDown, Search, X, Check, Loader2 } from "lucide-react";
 
 interface Option {
   value: string;
@@ -37,132 +39,159 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const filteredOptions = options.filter((option) =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtrado optimizado: Memoizado para rendimiento
+  const filteredOptions = useMemo(() => {
+    const safeSearch = searchTerm.toLowerCase().trim();
+    if (!safeSearch) return options;
+    return options.filter((option) =>
+      option.label.toLowerCase().includes(safeSearch)
+    );
+  }, [options, searchTerm]);
 
-  const selectedOption = options.find((option) => option.value === value);
+  // Encontrar la opción seleccionada para mostrar su etiqueta
+  const selectedOption = useMemo(() =>
+      options.find((option) => option.value === value)
+    , [options, value]);
 
+  // Cerrar al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        setSearchTerm("");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Autofocus al abrir el menú
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
+      const timer = setTimeout(() => searchInputRef.current?.focus(), 50);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
   const handleToggle = () => {
-    if (!disabled && !loading) {
-      setIsOpen(!isOpen);
-      setSearchTerm("");
-    }
+    if (!disabled) setIsOpen(!isOpen);
   };
 
-  const handleOptionSelect = (option: Option) => {
-    onChange(option.value);
+  const handleOptionSelect = (val: string) => {
+    // Si haces clic en el que ya está seleccionado, se limpia (toggle)
+    onChange(val === value ? "" : val);
     setIsOpen(false);
     setSearchTerm("");
   };
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation(); // CRÍTICO: Evita que handleToggle se dispare
+    onChange("");
+    setSearchTerm("");
+  };
+
   return (
-    <div className="space-y-1.5 w-full">
-      <div className="relative" ref={containerRef}>
-        {/* Trigger Button - Estilo más moderno y redondeado */}
+    <div className="flex flex-col gap-1.5 w-full" ref={containerRef}>
+      <div className="relative">
+        {/* Trigger Button */}
         <button
           type="button"
           onClick={handleToggle}
           disabled={disabled || loading}
           className={cn(
-            "flex h-11 w-full items-center justify-between rounded-lg border border-input bg-background px-4 py-2 text-sm",
-            "ring-offset-background transition-all duration-200 shadow-sm",
-            "hover:bg-accent/10 hover:border-accent-foreground/20",
-            "focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring",
+            "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-all",
+            "ring-offset-background text-left",
+            "focus:outline-none focus:ring-1 focus:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            error && "border-destructive focus:ring-destructive/30 focus:border-destructive",
+            error && "border-destructive focus:ring-destructive",
             className
           )}
         >
-          <span className={cn("truncate font-medium", !selectedOption && "text-muted-foreground font-normal")}>
-            {loading ? "Cargando..." : selectedOption ? selectedOption.label : placeholder}
+          <span className={cn("truncate block", !selectedOption && "text-muted-foreground")}>
+            {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <div className="flex items-center gap-2">
-            {selectedOption && !disabled && (
-              <div
-                onClick={(e) => { e.stopPropagation(); onChange(""); }}
-                className="p-1 rounded-full hover:bg-muted transition-colors"
-              >
-                <X className="h-3.5 w-3.5 text-muted-foreground" />
-              </div>
+
+          <div className="flex items-center gap-1 ml-2 shrink-0">
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            ) : (
+              <>
+                {value && !disabled && (
+                  <X
+                    className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    onClick={handleClear}
+                  />
+                )}
+                <ChevronDown className={cn(
+                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                  isOpen && "rotate-180"
+                )} />
+              </>
             )}
-            <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")} />
           </div>
         </button>
 
-        {/* Dropdown - Redondeado XL y Animación Sutil */}
+        {/* Dropdown Menu */}
         {isOpen && (
-          <div className="absolute top-full z-50 mt-2 w-full rounded-xl border border-border bg-popover text-popover-foreground shadow-xl animate-in fade-in zoom-in-95 duration-200">
-            {/* Search Box con fondo sutil */}
-            <div className="p-2.5">
-              <div className="relative flex items-center bg-muted/50 rounded-md px-2 focus-within:bg-background focus-within:ring-1 focus-within:ring-ring transition-all">
-                <Search className="h-4 w-4 text-muted-foreground ml-1" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={searchPlaceholder}
-                  className="w-full pl-2 pr-3 py-2 text-sm bg-transparent focus:outline-none"
-                />
-              </div>
+          <div className={cn(
+            "absolute top-full z-50 mt-1 w-full min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in zoom-in-95 duration-100 origin-top"
+          )}>
+            {/* Search Box */}
+            <div className="flex items-center border-b px-3 bg-muted/20">
+              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+              <input
+                ref={searchInputRef}
+                className="flex h-9 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setIsOpen(false);
+                }}
+              />
             </div>
 
             {/* Options List */}
-            <div className="max-h-64 overflow-y-auto px-1.5 pb-1.5 scrollbar-thin scrollbar-thumb-rounded">
+            <div className="max-h-[250px] overflow-y-auto p-1 scrollbar-thin">
               {filteredOptions.length === 0 ? (
-                <div className="px-3 py-6 text-sm text-muted-foreground text-center italic">
-                  No se encontraron resultados
+                <div className="py-6 text-center text-sm text-muted-foreground">
+                  No se encontraron resultados.
                 </div>
               ) : (
-                filteredOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => handleOptionSelect(option)}
-                    className={cn(
-                      "group flex w-full items-center justify-between px-3 py-2.5 my-0.5 text-sm rounded-md transition-colors",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      "focus:bg-accent focus:outline-none",
-                      option.value === value ? "bg-accent/50 text-accent-foreground font-medium" : "text-foreground/80"
-                    )}
-                  >
-                    <span className="truncate">{option.label}</span>
-                    {option.value === value && <Check className="h-4 w-4 text-primary shrink-0" />}
-                  </button>
-                ))
+                <div className="flex flex-col gap-0.5">
+                  {filteredOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleOptionSelect(option.value)}
+                      className={cn(
+                        "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors text-left",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        option.value === value ? "bg-accent text-accent-foreground" : "text-foreground"
+                      )}
+                    >
+                      <Check className={cn(
+                        "mr-2 h-4 w-4 shrink-0 transition-all",
+                        option.value === value ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                      )} />
+                      <span className="truncate">{option.label}</span>
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
           </div>
         )}
       </div>
 
-      {/* Footer Info */}
+      {/* Helper / Error Text */}
       {(error || helperText) && (
-        <div className="px-1">
-          {error ? (
-            <p className="text-xs font-medium text-destructive">{error}</p>
-          ) : (
-            <p className="text-xs text-muted-foreground">{helperText}</p>
-          )}
-        </div>
+        <p className={cn(
+          "text-[0.8rem] font-medium leading-none tracking-tight px-1",
+          error ? "text-destructive" : "text-muted-foreground"
+        )}>
+          {error || helperText}
+        </p>
       )}
     </div>
   );

@@ -1,8 +1,7 @@
 'use client';
 
-import { useForm, FormProvider, Controller } from 'react-hook-form';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { OpportunityFormData } from '@/app/types/opportunity';
+import {useForm, FormProvider, Controller} from 'react-hook-form';
+import {zodResolver} from "@hookform/resolvers/zod";
 import {
   ELEGIBLE_COUNTRIES,
   LEVELS,
@@ -17,33 +16,39 @@ import {
 } from "@/features/opportunities/schemas/opportunity.schema";
 
 // Shadcn UI
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {Textarea} from "@/components/ui/textarea";
+import {Label} from "@/components/ui/label";
+import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
 
 // Custom Shared Components
-import { FormField } from "@/components/forms/form-field";
-import { MultiSelect } from "@/components/forms/multi-select-custom";
-import { useState } from "react";
+import {FormField} from "@/components/forms/form-field";
+import {SearchableMultiSelect} from "@/components/forms/searchable-multi-select";
 import SearchableSelect from "@/components/forms/searchable-select";
+import {ComboboxCreative} from "@/components/forms/combobox-creative";
+import {DatePicker} from "@/components/forms/date-picker";
+import {Opportunity} from "@prisma/client";
 
 interface Props {
-  opportunity?: OpportunityFormData;
+  opportunity?: Opportunity;
   onSubmit: (data: OpportunityFormValues) => Promise<void>;
   onCancel: () => void;
+
+  // Skills
   skillsOptions: { value: string, label: string }[];
-  areaOptions: { value: string, label: string }[]; // Recibimos las áreas del padre
-  searchSkills: (value: string) => Promise<void> | undefined;
+  searchSkills: (value: string) => Promise<{ value: string, label: string }[]>;
   createSkill: (name: string) => Promise<{ value: string, label: string } | null>;
+
+  // Areas
+  areaOptions: { value: string, label: string }[]; // Recibimos las áreas del padre
+  searchAreas: (value: string) => Promise<{ value: string, label: string }[]>;
+  createArea: (name: string) => Promise<{ value: string, label: string } | null>;
+
+  // Organizations
+  organizationOptions: { value: string, label: string, logoUrl?: string }[];
+  searchOrganizations: (value: string) => Promise<{ value: string, label: string }[]>;
+  createOrganization: (name: string) => Promise<{ value: string, label: string } | null>;
 }
 
 export default function OpportunityForm({
@@ -53,7 +58,12 @@ export default function OpportunityForm({
                                           skillsOptions,
                                           areaOptions,
                                           createSkill,
-                                          searchSkills
+                                          searchSkills,
+                                          createArea,
+                                          searchAreas,
+                                          organizationOptions,
+                                          searchOrganizations,
+                                          createOrganization
                                         }: Props) {
   const methods = useForm<OpportunityFormValues>({
     resolver: zodResolver(opportunitySchema as any),
@@ -61,23 +71,14 @@ export default function OpportunityForm({
       type: '', title: '', organization: '', url: '', description: '',
       eligibleLevels: [], eligibleCountries: [], tags: [],
       requiredSkills: [], optionalSkills: [], fieldOfStudy: '',
-      modality: '', language: '', currency: 'USD', deadline: '',
+      modality: '', language: '', currency: 'USD', deadline: undefined,
       fundingAmount: undefined,
-      salaryRange: { min: undefined, max: undefined },
-      area: '', // Valor por defecto para el select
-      ...opportunity
+      salaryRange: {min: undefined, max: undefined},
+      area: '',
     }
   });
 
-  const { register, control, handleSubmit, formState: { errors, isSubmitting } } = methods;
-  const [skillSearch, setSkillSearch] = useState("");
-
-  const handleSearchChange = async (value: string) => {
-    setSkillSearch(value);
-    if (value.length >= 2) {
-      await searchSkills(value);
-    }
-  };
+  const {register, control, handleSubmit, formState: {errors, isSubmitting}} = methods;
 
   return (
     <FormProvider {...methods}>
@@ -96,7 +97,7 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="type"
-                  render={({ field }) => (
+                  render={({field}) => (
                     <SearchableSelect
                       options={OPPORTUNITY_TYPES}
                       onChange={field.onChange}
@@ -107,43 +108,60 @@ export default function OpportunityForm({
                   )}
                 />
               </FormField>
-              <FormField label="Título *" error={errors.title?.message}>
-                <Input {...register('title')} placeholder="Ej: Beca de Postgrado" />
+              <FormField label="URL de oportunidad *" error={errors.url?.message}>
+                <Input {...register('url')} type="url" placeholder="https://ejemplo.com"/>
               </FormField>
             </div>
 
             {/* Fila 2: Área y Organización */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Título *" error={errors.title?.message}>
+                <Input {...register('title')} placeholder="Ej: Beca de Postgrado"/>
+              </FormField>
               <FormField label="Área de Conocimiento *" error={errors.area?.message}>
                 <Controller
                   control={control}
                   name="area"
-                  render={({ field }) => (
-                    <SearchableSelect
-                      options={areaOptions}
+                  render={({field}) => (
+                    <ComboboxCreative
                       onChange={field.onChange}
                       value={field.value}
                       placeholder="Seleccionar área..."
-                      searchPlaceholder="Buscar área..."
+                      onCreate={createArea}
+                      onSearch={searchAreas}
+                      options={areaOptions}
                     />
                   )}
                 />
               </FormField>
-              <FormField label="Organización *" error={errors.organization?.message}>
-                <Input {...register('organization')} placeholder="Nombre de la empresa o institución" />
-              </FormField>
             </div>
 
             {/* Fila 3: URL */}
-            <div className="grid grid-cols-1 gap-6">
-              <FormField label="URL Oficial" error={errors.url?.message}>
-                <Input {...register('url')} type="url" placeholder="https://ejemplo.com" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField label="Organización" error={errors.organization?.message}>
+                <Controller
+                  control={control}
+                  name="organization"
+                  render={({field}) => (
+                    <ComboboxCreative
+                      onChange={field.onChange}
+                      value={field.value}
+                      placeholder="Seleccionar organizacion..."
+                      onCreate={createOrganization}
+                      onSearch={searchOrganizations}
+                      options={organizationOptions}
+                    />
+                  )}
+                />
+              </FormField>
+              <FormField label="Ubicacion" error={errors.organization?.message}>
+                <Input {...register('location')} placeholder="Ubicacion de la oportunidad"/>
               </FormField>
             </div>
 
             <FormField label="Descripción" error={errors.description?.message}>
               <Textarea {...register('description')} placeholder="Breve resumen de la oportunidad..."
-                        className="min-h-[120px]" />
+                        className="min-h-[120px]"/>
             </FormField>
           </CardContent>
         </Card>
@@ -151,7 +169,10 @@ export default function OpportunityForm({
         {/* SECCIÓN 2: REQUISITOS Y ELEGIBILIDAD */}
         <Card>
           <CardHeader>
-            <CardTitle>Requisitos y Alcance</CardTitle>
+            <CardTitle>
+              Requisitos y Alcance
+              <span className="text-muted-foreground text-xs">{" "}(Filtros excluyentes)</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -160,8 +181,8 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="eligibleLevels"
-                  render={({ field }) => (
-                    <MultiSelect
+                  render={({field}) => (
+                    <SearchableMultiSelect
                       options={LEVELS}
                       value={field.value}
                       onValueChange={field.onChange}
@@ -176,8 +197,8 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="eligibleCountries"
-                  render={({ field }) => (
-                    <MultiSelect
+                  render={({field}) => (
+                    <SearchableMultiSelect
                       options={ELEGIBLE_COUNTRIES}
                       value={field.value}
                       onValueChange={field.onChange}
@@ -194,31 +215,14 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="requiredSkills"
-                  render={({ field }) => (
-                    <MultiSelect
+                  render={({field}) => (
+                    <SearchableMultiSelect
                       options={skillsOptions}
                       value={field.value}
                       onValueChange={field.onChange}
-                      onSearchValueChange={handleSearchChange}
                       placeholder="Ej: Creativo, Trabajo en Equipo..."
-                      emptyIndicator={
-                        <div className="text-center p-4 text-muted-foreground">
-                          <p className="text-sm mb-2">No se ha encontrado <span className="font-bold">{skillSearch}</span></p>
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={async () => {
-                              if (!skillSearch || !createSkill) return;
-                              const result = await createSkill(skillSearch);
-                              if (!result) return;
-                              field.onChange([...(field.value || []), result.value]);
-                              setSkillSearch("");
-                            }}
-                          >
-                            Agregar {skillSearch}
-                          </Button>
-                        </div>
-                      }
+                      onCreate={createSkill}
+                      onSearch={searchSkills}
                     />
                   )}
                 />
@@ -228,31 +232,14 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="optionalSkills"
-                  render={({ field }) => (
-                    <MultiSelect
+                  render={({field}) => (
+                    <SearchableMultiSelect
                       options={skillsOptions}
                       value={field.value}
                       onValueChange={field.onChange}
-                      onSearchValueChange={setSkillSearch}
                       placeholder="Ej: Creativo, Trabajo en Equipo..."
-                      emptyIndicator={
-                        <div className="text-center p-4 text-muted-foreground">
-                          <p className="text-sm mb-2">No se ha encontrado <span className="font-bold">{skillSearch}</span></p>
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={async () => {
-                              if (!skillSearch || !createSkill) return;
-                              const result = await createSkill(skillSearch);
-                              if (!result) return;
-                              field.onChange([...(field.value || []), result.value]);
-                              setSkillSearch("");
-                            }}
-                          >
-                            Agregar {skillSearch}
-                          </Button>
-                        </div>
-                      }
+                      onCreate={createSkill}
+                      onSearch={searchSkills}
                     />
                   )}
                 />
@@ -272,13 +259,14 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="modality"
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-                      <SelectContent>
-                        {MODALITIES.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+                  render={({field}) => (
+                    <SearchableSelect
+                      options={MODALITIES}
+                      onChange={field.onChange}
+                      value={field.value}
+                      placeholder="Seleccionar"
+                      searchPlaceholder="Buscar"
+                    />
                   )}
                 />
               </FormField>
@@ -287,19 +275,31 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="language"
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-                      <SelectContent>
-                        {LANGUAGES.map(l => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+                  render={({field}) => (
+                    <SearchableSelect
+                      options={LANGUAGES}
+                      onChange={field.onChange}
+                      value={field.value}
+                      placeholder="Seleccionar"
+                      searchPlaceholder="Buscar"
+                    />
                   )}
                 />
               </FormField>
 
               <FormField label="Fecha Límite" error={errors.deadline?.message}>
-                <Input type="date" {...register('deadline')} />
+                <Controller
+                  control={control}
+                  name="deadline"
+                  render={({field}) => (
+                    <DatePicker
+                      value={field.value} // El valor debe ser un objeto Date
+                      onChange={field.onChange}
+                      placeholder="Seleccione la fecha límite"
+                      disabled={isSubmitting}
+                    />
+                  )}
+                />
               </FormField>
             </div>
 
@@ -308,26 +308,25 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="currency"
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {CURRENCIES.map(c => (
-                          <SelectItem key={c.value} value={c.value}>{c.value} ({c.label})</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  render={({field}) => (
+                    <SearchableSelect
+                      options={CURRENCIES}
+                      onChange={field.onChange}
+                      value={field.value}
+                      placeholder="Seleccionar"
+                      searchPlaceholder="Buscar"
+                    />
                   )}
                 />
               </FormField>
               <FormField label="Monto Total">
-                <Input type="number" {...register('fundingAmount')} placeholder="0.00" />
+                <Input type="number" {...register('fundingAmount')} placeholder="0.00"/>
               </FormField>
               <FormField label="Salario Min">
-                <Input type="number" {...register('salaryRange.min')} placeholder="Mínimo" />
+                <Input type="number" {...register('salaryRange.min')} placeholder="Mínimo"/>
               </FormField>
               <FormField label="Salario Max">
-                <Input type="number" {...register('salaryRange.max')} placeholder="Máximo" />
+                <Input type="number" {...register('salaryRange.max')} placeholder="Máximo"/>
               </FormField>
             </div>
           </CardContent>

@@ -1,8 +1,8 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import Footer from "@/components/footer";
+import Header from "@/components/header";
 import { getSession } from "@/lib/shared/session";
 
-export default async function PublicLayout({  
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -4,8 +4,10 @@ export const opportunitySchema = z.object({
   type: z.string().min(1, "El tipo es requerido"),
   title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
   organization: z.string().min(1, "La organización es requerida"),
+  organizationLogoUrl: z.string().optional(),
   url: z.string().optional(),
   description: z.string().optional(),
+  location: z.string().optional(),
   eligibleLevels: z.array(z.string()).default([]),
   eligibleCountries: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
@@ -21,7 +23,7 @@ export const opportunitySchema = z.object({
     min: z.coerce.number().optional(),
     max: z.coerce.number().optional(),
   }).optional(),
-  deadline: z.string().optional(),
+  deadline: z.date().optional(),
 });
 
 export type OpportunityFormValues = z.infer<typeof opportunitySchema>;

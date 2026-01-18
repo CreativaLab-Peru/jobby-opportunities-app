@@ -49,15 +49,16 @@ enum OpportunityType {
 // Opportunity — main resource
 // -----------------------------------------------------
 model Opportunity {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
-  type         OpportunityType @default(OTHER)
-  title        String
-  organization String?
-  description  String?
-  url          String?
-  language     String?         @default("EN") // ISO 639-1
-  ubication    String? // Ciudad, País de la oportunidad
-  fieldOfStudy String? // Area
+  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
+  type                OpportunityType @default(OTHER)
+  title               String
+  organization        String?
+  organizationLogoUrl String?
+  description         String?
+  url                 String?
+  language            String?         @default("EN") // ISO 639-1
+  ubication           String? // Ciudad, País de la oportunidad
+  fieldOfStudy        String? // Area
 
   // ---- Clasificación Estricta ----
   modality Modality          @default(ON_SITE)
@@ -106,6 +107,16 @@ model Area {
   createdAt DateTime @default(now())
 
   @@map("areas")
+}
+
+model Organization {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  key       String   @unique
+  logoUrl   String?
+  createdAt DateTime @default(now())
+
+  @@map("organizations")
 }
 
 enum Modality {

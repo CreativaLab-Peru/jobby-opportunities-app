@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Filters } from '@/components/FilterPanel';
+import { Filters } from '@/components/filter-panel';
 import {OpportunityListItem} from "@/app/types/opportunity";
 
 export function useOpportunities(userId?: string) {

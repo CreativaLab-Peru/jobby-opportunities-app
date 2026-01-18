@@ -9,7 +9,7 @@ import { useSession } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import OpportunityList from '@/components/opportunity-list';
-import FilterPanel from '@/components/FilterPanel';
+import FilterPanel from '@/components/filter-panel';
 import Pagination from '@/components/Pagination';
 
 // Tipos del Dominio y del Action
