@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import {slugify} from "@/utils/slugify";
-import {auth} from "@/lib/auth";
 import {getSession} from "@/features/auth/actions/get-session";
 
 // GET - Obtener skills con búsqueda y paginación

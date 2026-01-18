@@ -9,6 +9,7 @@ export const opportunitySchema = z.object({
   eligibleLevels: z.array(z.string()).default([]),
   eligibleCountries: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
+  area: z.string().min(1, "El área es requerida"),
   requiredSkills: z.array(z.string()).default([]),
   optionalSkills: z.array(z.string()).default([]),
   fieldOfStudy: z.string().optional(),

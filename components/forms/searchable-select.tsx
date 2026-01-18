@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Search, X } from "lucide-react";
+import { ChevronDown, Search, X, Check } from "lucide-react";
 
 interface Option {
   value: string;
@@ -21,49 +21,39 @@ interface SearchableSelectProps {
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
-  options,
-  value,
-  onChange,
-  placeholder = "Seleccionar...",
-  searchPlaceholder = "Buscar...",
-  className,
-  disabled = false,
-  error,
-  helperText,
-  loading = false,
-}) => {
+                                                             options,
+                                                             value,
+                                                             onChange,
+                                                             placeholder = "Seleccionar...",
+                                                             searchPlaceholder = "Buscar...",
+                                                             className,
+                                                             disabled = false,
+                                                             error,
+                                                             helperText,
+                                                             loading = false,
+                                                           }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Filtrar opciones basado en el término de búsqueda
   const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Encontrar la opción seleccionada
   const selectedOption = options.find((option) => option.value === value);
 
-  // Cerrar dropdown cuando se hace clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
         setSearchTerm("");
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Enfocar el input de búsqueda cuando se abre el dropdown
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
@@ -71,7 +61,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   }, [isOpen]);
 
   const handleToggle = () => {
-    if (!disabled) {
+    if (!disabled && !loading) {
       setIsOpen(!isOpen);
       setSearchTerm("");
     }
@@ -83,82 +73,63 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     setSearchTerm("");
   };
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange("");
-  };
-
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5 w-full">
       <div className="relative" ref={containerRef}>
-        {/* Trigger Button */}
+        {/* Trigger Button - Estilo más moderno y redondeado */}
         <button
           type="button"
           onClick={handleToggle}
           disabled={disabled || loading}
           className={cn(
-            "flex h-10 w-full items-center justify-between rounded-radius border border-input bg-background px-3 py-2 text-sm",
-            "ring-offset-background transition-colors",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "flex h-11 w-full items-center justify-between rounded-lg border border-input bg-background px-4 py-2 text-sm",
+            "ring-offset-background transition-all duration-200 shadow-sm",
+            "hover:bg-accent/10 hover:border-accent-foreground/20",
+            "focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            "appearance-none cursor-pointer",
-            error && "border-destructive focus-visible:ring-destructive",
+            error && "border-destructive focus:ring-destructive/30 focus:border-destructive",
             className
           )}
         >
-          <span
-            className={cn(
-              "truncate",
-              !selectedOption && "text-muted-foreground"
-            )}
-          >
-            {loading
-              ? "Cargando..."
-              : selectedOption
-              ? selectedOption.label
-              : placeholder}
+          <span className={cn("truncate font-medium", !selectedOption && "text-muted-foreground font-normal")}>
+            {loading ? "Cargando..." : selectedOption ? selectedOption.label : placeholder}
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {selectedOption && !disabled && (
-              <X
-                className="h-4 w-4 text-muted-foreground hover:text-foreground"
-                onClick={handleClear}
-              />
+              <div
+                onClick={(e) => { e.stopPropagation(); onChange(""); }}
+                className="p-1 rounded-full hover:bg-muted transition-colors"
+              >
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
             )}
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform",
-                isOpen && "rotate-180"
-              )}
-            />
+            <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")} />
           </div>
         </button>
 
-        {/* Dropdown */}
+        {/* Dropdown - Redondeado XL y Animación Sutil */}
         {isOpen && (
-          <div className="absolute top-full z-50 mt-1 w-full rounded-radius border border-input bg-background shadow-lg">
-            {/* Search Input */}
-            <div className="p-2 border-b">
-              <div className="relative">
-                <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="absolute top-full z-50 mt-2 w-full rounded-xl border border-border bg-popover text-popover-foreground shadow-xl animate-in fade-in zoom-in-95 duration-200">
+            {/* Search Box con fondo sutil */}
+            <div className="p-2.5">
+              <div className="relative flex items-center bg-muted/50 rounded-md px-2 focus-within:bg-background focus-within:ring-1 focus-within:ring-ring transition-all">
+                <Search className="h-4 w-4 text-muted-foreground ml-1" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={searchPlaceholder}
-                  className="w-full pl-8 pr-3 py-2 text-sm border-0 bg-transparent focus:outline-none"
+                  className="w-full pl-2 pr-3 py-2 text-sm bg-transparent focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Options List */}
-            <div className="max-h-60 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto px-1.5 pb-1.5 scrollbar-thin scrollbar-thumb-rounded">
               {filteredOptions.length === 0 ? (
-                <div className="px-3 py-2 text-sm text-muted-foreground text-center">
-                  {searchTerm
-                    ? "No se encontraron resultados"
-                    : "No hay opciones disponibles"}
+                <div className="px-3 py-6 text-sm text-muted-foreground text-center italic">
+                  No se encontraron resultados
                 </div>
               ) : (
                 filteredOptions.map((option) => (
@@ -167,13 +138,14 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
                     type="button"
                     onClick={() => handleOptionSelect(option)}
                     className={cn(
-                      "w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground",
-                      "focus:bg-accent focus:text-accent-foreground focus:outline-none",
-                      option.value === value &&
-                        "bg-accent text-accent-foreground"
+                      "group flex w-full items-center justify-between px-3 py-2.5 my-0.5 text-sm rounded-md transition-colors",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      "focus:bg-accent focus:outline-none",
+                      option.value === value ? "bg-accent/50 text-accent-foreground font-medium" : "text-foreground/80"
                     )}
                   >
-                    {option.label}
+                    <span className="truncate">{option.label}</span>
+                    {option.value === value && <Check className="h-4 w-4 text-primary shrink-0" />}
                   </button>
                 ))
               )}
@@ -182,9 +154,15 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         )}
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      {helperText && !error && (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
+      {/* Footer Info */}
+      {(error || helperText) && (
+        <div className="px-1">
+          {error ? (
+            <p className="text-xs font-medium text-destructive">{error}</p>
+          ) : (
+            <p className="text-xs text-muted-foreground">{helperText}</p>
+          )}
+        </div>
       )}
     </div>
   );

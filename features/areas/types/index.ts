@@ -1,4 +1,4 @@
-export type SkillOption = {
+export type AreaOption = {
   value: string;
   label: string;
 };

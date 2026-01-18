@@ -1,8 +1,8 @@
 'use client';
 
-import {useForm, FormProvider, Controller} from 'react-hook-form';
-import {zodResolver} from "@hookform/resolvers/zod";
-import {OpportunityFormData} from '@/app/types/opportunity';
+import { useForm, FormProvider, Controller } from 'react-hook-form';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { OpportunityFormData } from '@/app/types/opportunity';
 import {
   ELEGIBLE_COUNTRIES,
   LEVELS,
@@ -17,11 +17,11 @@ import {
 } from "@/features/opportunities/schemas/opportunity.schema";
 
 // Shadcn UI
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {Textarea} from "@/components/ui/textarea";
-import {Label} from "@/components/ui/label";
-import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -31,18 +31,19 @@ import {
 } from "@/components/ui/select";
 
 // Custom Shared Components
-import {FormField} from "@/components/forms/form-field";
-import {DynamicListInput} from "@/features/opportunities/components/forms/dynamic-list-input";
-import {MultiSelect} from "@/components/forms/multi-select-custom";
-import {useState} from "react";
+import { FormField } from "@/components/forms/form-field";
+import { MultiSelect } from "@/components/forms/multi-select-custom";
+import { useState } from "react";
+import SearchableSelect from "@/components/forms/searchable-select";
 
 interface Props {
   opportunity?: OpportunityFormData;
   onSubmit: (data: OpportunityFormValues) => Promise<void>;
   onCancel: () => void;
   skillsOptions: { value: string, label: string }[];
-  searchSkills?: (value: string) => Promise<void>;
-  createSkill?: (name: string) => Promise<void>;
+  areaOptions: { value: string, label: string }[]; // Recibimos las áreas del padre
+  searchSkills: (value: string) => Promise<void> | undefined;
+  createSkill: (name: string) => Promise<{ value: string, label: string } | null>;
 }
 
 export default function OpportunityForm({
@@ -50,6 +51,7 @@ export default function OpportunityForm({
                                           onSubmit,
                                           onCancel,
                                           skillsOptions,
+                                          areaOptions,
                                           createSkill,
                                           searchSkills
                                         }: Props) {
@@ -61,14 +63,21 @@ export default function OpportunityForm({
       requiredSkills: [], optionalSkills: [], fieldOfStudy: '',
       modality: '', language: '', currency: 'USD', deadline: '',
       fundingAmount: undefined,
-      salaryRange: {min: undefined, max: undefined},
+      salaryRange: { min: undefined, max: undefined },
+      area: '', // Valor por defecto para el select
       ...opportunity
     }
   });
 
-  const {register, control, handleSubmit, formState: {errors, isSubmitting}} = methods;
-
+  const { register, control, handleSubmit, formState: { errors, isSubmitting } } = methods;
   const [skillSearch, setSkillSearch] = useState("");
+
+  const handleSearchChange = async (value: string) => {
+    setSkillSearch(value);
+    if (value.length >= 2) {
+      await searchSkills(value);
+    }
+  };
 
   return (
     <FormProvider {...methods}>
@@ -81,38 +90,60 @@ export default function OpportunityForm({
             <CardDescription>Detalles básicos de la convocatoria.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Fila 1: Tipo y Título */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField label="Tipo de Oportunidad *" error={errors.type?.message}>
                 <Controller
                   control={control}
                   name="type"
-                  render={({field}) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger><SelectValue placeholder="Seleccionar tipo"/></SelectTrigger>
-                      <SelectContent>
-                        {OPPORTUNITY_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+                  render={({ field }) => (
+                    <SearchableSelect
+                      options={OPPORTUNITY_TYPES}
+                      onChange={field.onChange}
+                      value={field.value}
+                      placeholder="Seleccionar tipo..."
+                      searchPlaceholder="Buscar tipo..."
+                    />
                   )}
                 />
               </FormField>
               <FormField label="Título *" error={errors.title?.message}>
-                <Input {...register('title')} placeholder="Ej: Beca de Postgrado"/>
+                <Input {...register('title')} placeholder="Ej: Beca de Postgrado" />
               </FormField>
             </div>
 
+            {/* Fila 2: Área y Organización */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Organización *" error={errors.organization?.message}>
-                <Input {...register('organization')} placeholder="Nombre de la empresa o institución"/>
+              <FormField label="Área de Conocimiento *" error={errors.area?.message}>
+                <Controller
+                  control={control}
+                  name="area"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      options={areaOptions}
+                      onChange={field.onChange}
+                      value={field.value}
+                      placeholder="Seleccionar área..."
+                      searchPlaceholder="Buscar área..."
+                    />
+                  )}
+                />
               </FormField>
+              <FormField label="Organización *" error={errors.organization?.message}>
+                <Input {...register('organization')} placeholder="Nombre de la empresa o institución" />
+              </FormField>
+            </div>
+
+            {/* Fila 3: URL */}
+            <div className="grid grid-cols-1 gap-6">
               <FormField label="URL Oficial" error={errors.url?.message}>
-                <Input {...register('url')} type="url" placeholder="https://ejemplo.com"/>
+                <Input {...register('url')} type="url" placeholder="https://ejemplo.com" />
               </FormField>
             </div>
 
             <FormField label="Descripción" error={errors.description?.message}>
               <Textarea {...register('description')} placeholder="Breve resumen de la oportunidad..."
-                        className="min-h-[120px]"/>
+                        className="min-h-[120px]" />
             </FormField>
           </CardContent>
         </Card>
@@ -129,22 +160,12 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="eligibleLevels"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <MultiSelect
                       options={LEVELS}
                       value={field.value}
                       onValueChange={field.onChange}
-                      onSearchValueChange={setSkillSearch}
                       placeholder="Ej: Practicante, Profesional..."
-                      emptyIndicator={
-                        <div className="text-center p-4 text-muted-foreground">
-                          <p className="text-sm mb-2">No se ha encontrado</p>
-                        </div>
-                      }
-                      animationConfig={{
-                        badgeAnimation: "bounce",
-                        popoverAnimation: "slide",
-                      }}
                     />
                   )}
                 />
@@ -155,7 +176,7 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="eligibleCountries"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <MultiSelect
                       options={ELEGIBLE_COUNTRIES}
                       value={field.value}
@@ -165,7 +186,6 @@ export default function OpportunityForm({
                   )}
                 />
               </div>
-
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -174,39 +194,31 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="requiredSkills"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <MultiSelect
                       options={skillsOptions}
                       value={field.value}
                       onValueChange={field.onChange}
-                      onSearchValueChange={setSkillSearch}
-                      placeholder="Ej: Practicante, Profesional..."
+                      onSearchValueChange={handleSearchChange}
+                      placeholder="Ej: Creativo, Trabajo en Equipo..."
                       emptyIndicator={
                         <div className="text-center p-4 text-muted-foreground">
-                          <p className="text-sm mb-2">No se ha encontrado
-                            <span className="font-bold">{" "}{skillSearch}</span>
-                          </p>
+                          <p className="text-sm mb-2">No se ha encontrado <span className="font-bold">{skillSearch}</span></p>
                           <Button
                             type="button"
                             size="sm"
                             onClick={async () => {
-                              if (!skillSearch) return;
-                              if (!createSkill) return;
-                              // Agregamos el valor actual de la búsqueda al array de seleccionados
-                              const newValue = [...(field.value || []), skillSearch];
-                              field.onChange(newValue);
-                              await createSkill(skillSearch!); // Creamos la nueva habilidad
-                              setSkillSearch(""); // Limpiamos la búsqueda tras agregar
+                              if (!skillSearch || !createSkill) return;
+                              const result = await createSkill(skillSearch);
+                              if (!result) return;
+                              field.onChange([...(field.value || []), result.value]);
+                              setSkillSearch("");
                             }}
                           >
                             Agregar {skillSearch}
                           </Button>
                         </div>
                       }
-                      animationConfig={{
-                        badgeAnimation: "bounce",
-                        popoverAnimation: "slide",
-                      }}
                     />
                   )}
                 />
@@ -216,44 +228,35 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="optionalSkills"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <MultiSelect
                       options={skillsOptions}
                       value={field.value}
                       onValueChange={field.onChange}
                       onSearchValueChange={setSkillSearch}
-                      placeholder="Ej: Practicante, Profesional..."
+                      placeholder="Ej: Creativo, Trabajo en Equipo..."
                       emptyIndicator={
                         <div className="text-center p-4 text-muted-foreground">
-                          <p className="text-sm mb-2">No se ha encontrado
-                            <span className="font-bold">{" "}{skillSearch}</span>
-                          </p>
+                          <p className="text-sm mb-2">No se ha encontrado <span className="font-bold">{skillSearch}</span></p>
                           <Button
                             type="button"
                             size="sm"
                             onClick={async () => {
-                              if (!skillSearch) return;
-                              if (!createSkill) return;
-                              // Agregamos el valor actual de la búsqueda al array de seleccionados
-                              const newValue = [...(field.value || []), skillSearch];
-                              field.onChange(newValue);
-                              await createSkill(skillSearch!); // Creamos la nueva habilidad
-                              setSkillSearch(""); // Limpiamos la búsqueda tras agregar
+                              if (!skillSearch || !createSkill) return;
+                              const result = await createSkill(skillSearch);
+                              if (!result) return;
+                              field.onChange([...(field.value || []), result.value]);
+                              setSkillSearch("");
                             }}
                           >
                             Agregar {skillSearch}
                           </Button>
                         </div>
                       }
-                      animationConfig={{
-                        badgeAnimation: "bounce",
-                        popoverAnimation: "slide",
-                      }}
                     />
                   )}
                 />
               </div>
-
             </div>
           </CardContent>
         </Card>
@@ -269,9 +272,9 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="modality"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
                       <SelectContent>
                         {MODALITIES.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
                       </SelectContent>
@@ -284,9 +287,9 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="language"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger><SelectValue placeholder="Seleccionar"/></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
                       <SelectContent>
                         {LANGUAGES.map(l => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
                       </SelectContent>
@@ -305,13 +308,12 @@ export default function OpportunityForm({
                 <Controller
                   control={control}
                   name="currency"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger><SelectValue/></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {CURRENCIES.map(c => (
-                          <SelectItem key={c.value}
-                                      value={c.value}>{c.value} ({c.label})</SelectItem>
+                          <SelectItem key={c.value} value={c.value}>{c.value} ({c.label})</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -319,13 +321,13 @@ export default function OpportunityForm({
                 />
               </FormField>
               <FormField label="Monto Total">
-                <Input type="number" {...register('fundingAmount')} placeholder="0.00"/>
+                <Input type="number" {...register('fundingAmount')} placeholder="0.00" />
               </FormField>
               <FormField label="Salario Min">
-                <Input type="number" {...register('salaryRange.min')} placeholder="Mínimo"/>
+                <Input type="number" {...register('salaryRange.min')} placeholder="Mínimo" />
               </FormField>
               <FormField label="Salario Max">
-                <Input type="number" {...register('salaryRange.max')} placeholder="Máximo"/>
+                <Input type="number" {...register('salaryRange.max')} placeholder="Máximo" />
               </FormField>
             </div>
           </CardContent>

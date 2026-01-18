@@ -102,6 +102,7 @@ model Skill {
 model Area {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String   @unique
+  key       String   @unique
   createdAt DateTime @default(now())
 
   @@map("areas")
