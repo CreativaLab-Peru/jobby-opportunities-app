@@ -28,15 +28,27 @@ export async function upsertOpportunityAction(body: OpportunityFormValues, id?: 
     const normalizedSkills = Array.from(new Set(rawSkills.map(getCanonicalSkill)));
 
     // Upsert de Tags (Master Data)
-    await Promise.all(
-      normalizedSkills.map(skillName =>
-        prisma.tag.upsert({
-          where: { name: skillName },
-          update: {},
-          create: { name: skillName, category: "skill" }
-        })
-      )
-    );
+    // await Promise.all(
+    //   normalizedSkills.map(skillName =>
+    //     prisma.tag.upsert({
+    //       where: { name: skillName },
+    //       update: {},
+    //       create: { name: skillName, category: "skill" }
+    //     })
+    //   )
+    // );
+
+    // Blind organization logo URL if organization is provided
+    if (body.organization) {
+      const findOrganization = await prisma.organization.findUnique({
+        where: {
+          key: body.organization,
+        },
+      });
+      if (findOrganization && findOrganization?.logoUrl) {
+        body.organizationLogoUrl = findOrganization.logoUrl;
+      }
+    }
 
     // 3. Preparación del objeto de datos (Mapeo Schema -> Prisma)
     const opportunityData = {

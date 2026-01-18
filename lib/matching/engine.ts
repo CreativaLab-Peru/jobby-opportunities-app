@@ -47,7 +47,7 @@ function hardRequirementsScore(cv: CVAnalysis, opp: Opportunity): number {
 // 3. Función Principal de Scoring
 export async function scoreOpportunity(cv: CVAnalysis, opp: Opportunity) {
   // Enriquecemos el texto de la oportunidad para el embedding
-  const oppText = cleanText(`${opp.title} ${opp.description} ${opp.tags?.join(' ')}`);
+  const oppText = cleanText(`${opp.title} ${opp.description} ${opp.requiredSkills?.join(' ')}`);
   const cvText = cleanText(`${cv.summary} ${cv.experience_text} ${cv.skills.join(' ')}`);
 
   const [embCv, embOpp] = await Promise.all([
@@ -89,7 +89,10 @@ export async function scoreOpportunity(cv: CVAnalysis, opp: Opportunity) {
     details: {
       modality: opp.modality,
       deadline: opp.deadline,
-      salary: opp.salaryRange,
+      salary: {
+        min: opp.minSalary,
+        max: opp.maxSalary
+      },
       currency: opp.currency,
       url: opp.url,
       popularity: opp.popularityScore,

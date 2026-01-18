@@ -39,6 +39,18 @@ export async function updateOpportunityAction(id: string, body: OpportunityFormV
     ];
     const normalizedSkills = Array.from(new Set(rawSkills.map(getCanonicalSkill)));
 
+    // Blind organization logo URL if organization is provided
+    if (body.organization) {
+      const findOrganization = await prisma.organization.findUnique({
+        where: {
+          key: body.organization,
+        },
+      });
+      if (findOrganization && findOrganization?.logoUrl) {
+        body.organizationLogoUrl = findOrganization.logoUrl;
+      }
+    }
+
     // 4. Ejecución de la Actualización
     const opportunity = await prisma.opportunity.update({
       where: { id },

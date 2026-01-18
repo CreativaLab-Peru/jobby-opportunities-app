@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { scoreOpportunity } from "@/lib/matching/engine";
 import {CVAnalysis, MatchRequest} from "@/features/math/types";
-import {OpportunityType} from "@prisma/client";
+import {Modality, OpportunityType} from "@prisma/client";
 
 export async function POST(
   req: NextRequest,
@@ -34,7 +34,7 @@ export async function POST(
         deadline: filters?.exclude_expired ? { gte: new Date() } : undefined,
 
         // 2. Filtro de modalidad (Casting automático si usas el Enum en el esquema)
-        modality: preferences?.modality,
+        modality: preferences?.modality as Modality,
 
         // 3. Filtro de elegibilidad (Ubicación)
         eligibleCountries: cvData?.location ? { has: cvData.location } : undefined,
@@ -53,8 +53,7 @@ export async function POST(
         // Verificamos que exista tanto la preferencia como el dato en la oportunidad
         if (
           preferences?.min_salary &&
-          o?.salaryRange &&
-          (o.salaryRange as any)?.min < preferences.min_salary
+          o?.minSalary && o?.minSalary < preferences.min_salary
         ) {
           scoreData.match_score *= 0.8;
         }
