@@ -3,19 +3,22 @@ POST http://localhost:3000/api/match/users/123/cvs/456
 Content-Type: application/json
 
 {
-  "top_k": 5,
-  "cv": {
+  "cv_data": {
     "summary": "Software Engineer with experience in backend development and APIs",
-    "experience_text": "3 years working with Node.js, Next.js, Prisma and PostgreSQL. Built matching engines and REST APIs.",
-    "skills": [
-      "Node.js",
-      "Next.js",
-      "Prisma",
-      "PostgreSQL",
-      "TypeScript"
-    ],
-    "countries": ["Peru"],
+    "experience_text": "3 years working with Node.js, Next.js, Prisma and PostgreSQL.",
+    "skills": ["Node.js", "Next.js", "Prisma", "PostgreSQL", "TypeScript"],
+    "location": "Peru",
+    "level": "Mid",
     "languages": ["Spanish", "English"]
+  },
+  "preferences": {
+    "modality": "Remote",
+    "min_salary": 3000,
+    "currency": "USD",
+    "top_k": 5
+  },
+  "filters": {
+    "exclude_expired": true
   }
 }
 
@@ -25,32 +28,37 @@ POST http://localhost:3000/api/match/users/124/cvs/457
 Content-Type: application/json
 
 {
-  "top_k": 3,
-  "cv": {
+  "cv_data": {
     "summary": "Junior software developer",
     "experience_text": "Internship building small web applications using JavaScript and React.",
-    "skills": ["JavaScript", "React"]
+    "skills": ["JavaScript", "React"],
+    "level": "Junior"
+  },
+  "preferences": {
+    "top_k": 3
+  },
+  "filters": {
+    "only_eligible": true
   }
 }
 
 ### Match – Data / AI profile
-POST http://localhost:3000/api/match/users/125/cvs/458
+POST http://localhost:3000/api/match/users/128/cvs/461
 Content-Type: application/json
 
 {
-  "top_k": 5,
-  "cv": {
-    "summary": "Data scientist focused on machine learning and NLP",
-    "experience_text": "Worked on ML models using Python, scikit-learn, and transformers for text similarity.",
-    "skills": [
-      "Python",
-      "Machine Learning",
-      "NLP",
-      "scikit-learn",
-      "Transformers"
-    ],
-    "countries": ["Peru", "Chile"],
-    "languages": ["English"]
+  "cv_data": {
+    "text": "Full original CV text here...",
+    "summary": "Senior software architect with 10+ years of experience",
+    "experience_text": "Designed scalable systems and led engineering teams.",
+    "skills": ["System Design", "Microservices", "Node.js", "AWS", "PostgreSQL"],
+    "location": "USA",
+    "level": "Senior",
+    "languages": ["English", "Spanish"]
+  },
+  "preferences": {
+    "field_of_study": "Computer Science",
+    "top_k": 5
   }
 }
 
@@ -79,17 +87,16 @@ POST http://localhost:3000/api/match/users/127/cvs/460
 Content-Type: application/json
 
 {
-  "top_k": 4,
-  "cv": {
+  "cv_data": {
     "summary": "Digital marketing specialist",
     "experience_text": "Managed social media campaigns, SEO strategies, and Google Ads for small businesses.",
-    "skills": [
-      "Digital Marketing",
-      "SEO",
-      "Google Ads",
-      "Content Strategy"
-    ],
-    "languages": ["Spanish", "English"]
+    "skills": ["Digital Marketing", "SEO", "Google Ads", "Content Strategy"],
+    "languages": ["Spanish", "English"],
+    "level": "Mid"
+  },
+  "preferences": {
+    "top_k": 4,
+    "modality": "Hybrid"
   }
 }
 
@@ -98,19 +105,21 @@ POST http://localhost:3000/api/match/users/128/cvs/461
 Content-Type: application/json
 
 {
-  "top_k": 5,
-  "cv": {
+  "cv_data": {
     "summary": "Senior software architect with 10+ years of experience",
-    "experience_text": "Designed scalable systems, led engineering teams, and defined backend architectures for high-traffic platforms.",
-    "skills": [
-      "System Design",
-      "Microservices",
-      "Node.js",
-      "AWS",
-      "PostgreSQL"
-    ],
-    "countries": ["Peru", "USA"],
+    "experience_text": "Designed scalable systems, led engineering teams, and defined backend architectures.",
+    "skills": ["System Design", "Microservices", "Node.js", "AWS", "PostgreSQL"],
+    "location": "Peru",
+    "level": "Senior",
     "languages": ["English", "Spanish"]
+  },
+  "preferences": {
+    "top_k": 5,
+    "min_salary": 8000,
+    "currency": "USD"
+  },
+  "filters": {
+    "exclude_expired": true
   }
 }
 
@@ -119,12 +128,18 @@ POST http://localhost:3000/api/match/users/129/cvs/462
 Content-Type: application/json
 
 {
-  "top_k": 5,
-  "cv": {
+  "cv_data": {
     "summary": "Student exploring opportunities",
     "experience_text": "Currently studying and exploring different fields.",
     "skills": [],
-    "languages": ["Spanish"]
+    "languages": ["Spanish"],
+    "level": "Junior"
+  },
+  "preferences": {
+    "top_k": 5
+  },
+  "filters": {
+    "only_eligible": true
   }
 }
 
@@ -133,15 +148,14 @@ POST http://localhost:3000/api/match/users/130/cvs/463
 Content-Type: application/json
 
 {
-  "top_k": 10,
-  "cv": {
+  "cv_data": {
     "summary": "Backend developer interested in scholarships and internships",
     "experience_text": "Experience with REST APIs, databases, and cloud deployment.",
-    "skills": [
-      "Node.js",
-      "REST APIs",
-      "SQL",
-      "Docker"
-    ]
+    "skills": ["Node.js", "REST APIs", "SQL", "Docker"],
+    "level": "Junior"
+  },
+  "preferences": {
+    "top_k": 10,
+    "field_of_study": "Computer Science"
   }
 }

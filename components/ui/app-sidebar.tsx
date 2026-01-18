@@ -3,7 +3,7 @@
 import {
   Home,
   Briefcase,
-  LogOut,
+  LogOut, Building,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -24,7 +24,8 @@ import {
 
 const menuItems = [
   { title: "Dashboard", href: "/dashboard", icon: Home },
-  { title: "Oportunidades", href: "/opportunities/new", icon: Briefcase },
+  { title: "Oportunidades", href: "/opportunities", icon: Briefcase },
+  { title: "Organizaciones", href: "/organizations", icon: Building },
 ] as const;
 
 export function AppSidebar() {

@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
+import { generateSearchVector } from "@/lib/matching/utils";
 import { prisma } from '@/lib/prisma';
+import {getCanonicalSkill} from "@/lib/matching/skills-utils";
+import {getSession} from "@/features/auth/actions/get-session";
 
 // GET - Obtener oportunidades del usuario actual con filtros y paginación
 export async function GET(request: Request) {
@@ -129,60 +132,84 @@ export async function GET(request: Request) {
   }
 }
 
-// POST - Crear nueva oportunidad
 export async function POST(request: Request) {
   try {
-    const userID = request.headers.get('user-id');
-
-    if (!userID) {
-        return NextResponse.json(
-          { error: 'Usuario no encontrado' },
-          { status: 404 }
-        );
+    const session = await getSession();
+    if (!session.success || !session.user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
+
+    const userId = session.user.id as string;
 
     const body = await request.json();
 
-    console.log('Creando nueva oportunidad');
-    console.log('Datos recibidos:', body);
+    // 1. Normalización de Skills y actualización del diccionario Tag
+    const rawSkills = [
+      ...(body.requiredSkills || []),
+      ...(body.optionalSkills || []),
+      ...(body.tags || [])
+    ];
 
-    // Preparar los datos con valores por defecto y conversiones necesarias
-    const createData = {
-      type: body.type,
-      title: body.title + "(prueba)",
-      organization: body.organization,
-      url: body.url || null,
-      description: body.description || null,
-      eligibleLevels: body.eligibleLevels || [],
-      eligibleCountries: body.eligibleCountries || [],
-      tags: body.tags || [],
-      requiredSkills: body.requiredSkills || [],
-      optionalSkills: body.optionalSkills || [],
-      userId: userID,
-      fieldOfStudy: body.fieldOfStudy || null,
-      modality: body.modality || null,
-      language: body.language || null,
-      fundingAmount: body.fundingAmount ? parseFloat(body.fundingAmount) : null,
-      currency: body.currency || null,
-      popularityScore: body.popularityScore ? parseInt(body.popularityScore) : 0,
-      deadline: body.deadline ? new Date(body.deadline) : null,
-      salaryRange: (body.salaryRange?.min || body.salaryRange?.max) ? {
-        min: body.salaryRange.min ? parseFloat(body.salaryRange.min) : null,
-        max: body.salaryRange.max ? parseFloat(body.salaryRange.max) : null,
-      } : null
-    };
+    // Obtenemos skills únicos y normalizados (ej: "React.js" -> "react")
+    const normalizedSkills = Array.from(new Set(rawSkills.map(getCanonicalSkill)));
 
+    // Upsert masivo en segundo plano o paralelo para el diccionario maestro
+    await Promise.all(
+      normalizedSkills.map(skillName =>
+        prisma.tag.upsert({
+          where: { name: skillName },
+          update: {},
+          create: { name: skillName, category: "skill" }
+        })
+      )
+    );
+
+    // 2. Preparación de la data para MongoDB
     const opportunity = await prisma.opportunity.create({
-      data: createData
+      data: {
+        type: body.type,
+        title: body.title,
+        organization: body.organization,
+        url: body.url || "",
+        description: body.description,
+        language: body.language || "ES",
+
+        // Enums y Clasificación
+        modality: body.modality || "ON_SITE",
+        status: "ACTIVE",
+
+        // Arrays normalizados para evitar fallos en el matching
+        eligibleLevels: (body.eligibleLevels || []).map((l: string) => l.toUpperCase()),
+        eligibleCountries: (body.eligibleCountries || []).map((c: string) => c.toUpperCase()),
+        requiredSkills: (body.requiredSkills || []).map(getCanonicalSkill),
+        optionalSkills: (body.optionalSkills || []).map(getCanonicalSkill),
+
+        fieldOfStudy: body.fieldOfStudy || null,
+
+        // Salarios (Doble entrada: para filtro rápido y para objeto embebido)
+        minSalary: body.salaryRange?.min ? parseFloat(body.salaryRange.min) : null,
+        maxSalary: body.salaryRange?.max ? parseFloat(body.salaryRange.max) : null,
+        currency: body.currency || "USD",
+
+        // Metadata de búsqueda (Optimiza el embedding)
+        searchVector: generateSearchVector({
+          title: body.title,
+          description: body.description,
+          organization: body.organization,
+          skills: normalizedSkills
+        }),
+
+        deadline: body.deadline ? new Date(body.deadline) : null,
+        popularityScore: body.popularityScore ? parseInt(body.popularityScore) : 0,
+        userId,
+      }
     });
 
-    console.log('Oportunidad creada exitosamente:', opportunity.id);
     return NextResponse.json(opportunity, { status: 201 });
   } catch (error) {
-    console.error('Error creando oportunidad:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    console.error('[CREATE_OPPORTUNITY_ERROR]:', error);
     return NextResponse.json(
-      { error: 'Error al crear oportunidad', details: errorMessage },
+      { error: 'Error al crear la oportunidad' },
       { status: 500 }
     );
   }

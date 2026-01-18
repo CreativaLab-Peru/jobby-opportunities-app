@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { signIn } from '@/lib/auth-client';
 import { Mail, Lock, Briefcase, ArrowRight } from 'lucide-react';
+import api, {setAuthHeaders} from "@/lib/api";
 
 export function LoginForm() {
   const [formData, setFormData] = useState({
@@ -28,6 +29,15 @@ export function LoginForm() {
         email: formData.email,
         password: formData.password,
       });
+      const userId = result.data?.user?.id;
+      if (userId) {
+        // 2. Configuramos el header en nuestra instancia de axios
+        setAuthHeaders(userId);
+
+        // 3. Opcional: Guardar en localStorage si necesitas persistencia
+        // tras un refresh (aunque lo ideal es usar cookies de sesión)
+        localStorage.setItem('user-id', userId);
+      }
 
       if (result.error) {
         setError(result.error.message || 'Error en el login');
@@ -36,7 +46,7 @@ export function LoginForm() {
 
       // Si el login es exitoso, forzar refresh y redirigir
       window.location.href = '/dashboard';
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error en el login');
     } finally {
@@ -59,7 +69,7 @@ export function LoginForm() {
             Accede a tu panel empresarial
           </p>
         </div>
-        
+
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
@@ -68,7 +78,7 @@ export function LoginForm() {
                 <span className="text-sm">{error}</span>
               </div>
             )}
-            
+
             <div className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">

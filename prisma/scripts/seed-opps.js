@@ -21,13 +21,6 @@ const sendBatch = async () => {
 
     console.log(`📤 Enviando ${opportunities.length} oportunidades...`);
 
-    const opportunitiesAux = [
-      ...opportunities.map(opportunity => {
-        const title = `${opportunity.title} (prueba)`;
-        return { title, ...opportunity };
-      })
-    ]
-
     try {
         const response = await fetch(url, {
             method: "POST",
