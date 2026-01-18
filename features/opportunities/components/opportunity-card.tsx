@@ -47,7 +47,7 @@ export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCa
   return (
     <div className={cn(
       "group relative flex flex-col sm:flex-row gap-4 p-5 bg-card border rounded-xl transition-all hover:shadow-md hover:border-primary/20",
-      opportunity.status === 'ACTIVE' && "opacity-60 grayscale"
+      opportunity.status === 'EXPIRED' && "opacity-60 grayscale"
     )}>
 
       {/* 1. Logo y Título */}
