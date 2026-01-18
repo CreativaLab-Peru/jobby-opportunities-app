@@ -29,7 +29,7 @@ export async function deleteOpportunityAction(id: string) {
       where: { id }
     });
 
-    revalidatePath("/dashboard");
+    revalidatePath("/opportunities");
     return { success: true, message: "Eliminada exitosamente" };
   } catch (error) {
     console.error("[DELETE_OPPORTUNITY_ERROR]:", error);

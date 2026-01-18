@@ -1,7 +1,7 @@
-import NewOpportunityScreen from "@/features/opportunities/components/new-opportunity-screen";
 import {getSkillsActions} from "@/features/skills/actions/get-skills-actions";
 import {getAreasAction} from "@/features/areas/actions/get-areas-action";
 import {getOrganizationsActions} from "@/features/organizations/actions/get-organizations-actions";
+import NewOpportunityScreen from "@/features/opportunities/screens/new-opportunity-screen";
 
 export default async function NewOpportunityPage() {
   const [resultsSkill, resultAreas, resultOrganizations] = await Promise.all([

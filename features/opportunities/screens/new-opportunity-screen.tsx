@@ -4,10 +4,8 @@ import {useRouter} from 'next/navigation';
 import {useCallback, useState} from 'react';
 import {toast} from "sonner";
 
-import OpportunityForm from '@/components/opportunity-form';
 import {OpportunityFormValues} from "@/features/opportunities/schemas/opportunity.schema";
 import {getSkillsActions} from "@/features/skills/actions/get-skills-actions";
-import {createOpportunityAction} from "@/features/opportunities/actions/create-opportunity-action";
 import {createSkillByNameAction} from "@/features/skills/actions/create-skill-by-name-action";
 import {AreaOption} from "@/features/areas/types";
 import {createAreaAction} from "@/features/areas/actions/create-area-action";
@@ -16,6 +14,8 @@ import {SkillOption} from "@/features/skills/type";
 import {OrganizationOption} from "@/features/organizations/types";
 import {createOrganizationAction} from "@/features/organizations/actions/create-organization-action";
 import {getOrganizationsActions} from "@/features/organizations/actions/get-organizations-actions";
+import OpportunityForm from "@/features/opportunities/components/opportunity-form";
+import {upsertOpportunityAction} from "@/features/opportunities/actions/create-opportunity-action";
 
 interface NewOpportunityScreenProps {
   initialSkillsOptions: SkillOption[];
@@ -57,11 +57,11 @@ export default function NewOpportunityScreen({
 
   const handleCreateOpportunity = useCallback(async (data: OpportunityFormValues) => {
     const toastId = toast.loading("Guardando oportunidad...");
-    const result = await createOpportunityAction(data);
+    const result = await upsertOpportunityAction(data);
 
     if (result.success) {
-      toast.success("Publicada con éxito", {id: toastId});
-      router.push('/dashboard');
+      toast.success("Agregado con éxito", {id: toastId});
+      router.push('/opportunities');
       router.refresh();
     } else {
       toast.error(result.error || "Ocurrió un error", {id: toastId});

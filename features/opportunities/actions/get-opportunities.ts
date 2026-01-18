@@ -58,9 +58,7 @@ export async function getOpportunities(
     const skip = (page - 1) * pageSize;
 
     // Filtro con validación de esquema de Prisma
-    const where: Prisma.OpportunityWhereInput = {
-      userId: session.user.id,
-    };
+    const where: Prisma.OpportunityWhereInput = {};
 
     if (search) {
       where.OR = [

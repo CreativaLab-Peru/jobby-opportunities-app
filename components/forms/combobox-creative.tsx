@@ -33,6 +33,7 @@ interface ComboboxCreativeProps {
   placeholder?: string;
   emptyMessage?: string;
   className?: string;
+  image?: boolean
 }
 
 export function ComboboxCreative({
@@ -41,6 +42,7 @@ export function ComboboxCreative({
                                    onCreate,
                                    onChange,
                                    value,
+                                   image,
                                    placeholder = "Seleccionar opción...",
                                    emptyMessage = "No se encontraron resultados.",
                                    className,
@@ -162,14 +164,15 @@ export function ComboboxCreative({
                       className="flex items-center gap-2"
                     >
                       <Check className={cn("h-4 w-4 shrink-0", value === option.value ? "opacity-100" : "opacity-0")} />
-
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border bg-muted overflow-hidden">
-                        {option.logoUrl ? (
-                          <img src={option.logoUrl} alt="" className="h-full w-full object-contain" />
-                        ) : (
-                          <ImageIcon className="h-3 w-3 text-muted-foreground" />
-                        )}
-                      </div>
+                      { image && (
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border bg-muted overflow-hidden">
+                          {option.logoUrl ? (
+                            <img src={option.logoUrl} alt="" className="h-full w-full object-contain" />
+                          ) : (
+                            <ImageIcon className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </div>
+                      )}
                       <span className="truncate flex-1">{option.label}</span>
                     </CommandItem>
                   ))}
@@ -206,7 +209,7 @@ export function ComboboxCreative({
                     }}
                   >
                     {isCreating ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Plus className="mr-2 h-3 w-3" />}
-                    Crear "{searchTerm}"
+                    Crear {searchTerm}
                   </Button>
                 </div>
               )}

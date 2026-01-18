@@ -8,7 +8,6 @@ import { useSession } from '@/lib/auth-client';
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import OpportunityList from '@/components/opportunity-list';
 import FilterPanel from '@/components/filter-panel';
 import Pagination from '@/components/Pagination';
 
@@ -16,6 +15,7 @@ import Pagination from '@/components/Pagination';
 import { Opportunity } from "@prisma/client";
 import { GetOpportunitiesParams, PaginationMetadata } from "@/features/opportunities/actions/get-opportunities";
 import {EmptyState} from "@/components/empty-state";
+import OpportunityList from "@/features/opportunities/components/opportunity-list";
 
 interface OpportunitiesScreenProps {
   initialData: Opportunity[];
@@ -147,7 +147,7 @@ export const OpportunitiesScreen = ({
           <div className="space-y-6">
             <OpportunityList
               opportunities={initialData}
-              onEdit={(opp) => router.push(`/opportunities/${opp.id}/edit`)}
+              onEdit={(opp: Opportunity) => router.push(`/opportunities/${opp.id}/edit`)}
               onDelete={handleDelete}
             />
             {pagination && pagination.totalPages > 1 && (

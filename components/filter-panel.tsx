@@ -1,10 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, Filter, ChevronDown, X } from 'lucide-react';
-import { LEVELS, MODALITIES, OPPORTUNITY_TYPES } from "@/consts";
+import * as React from 'react';
+import { Search, ListFilter, X, RotateCcw } from 'lucide-react';
+import { LEVELS, MODALITIES, OPPORTUNITY_TYPES, ELEGIBLE_COUNTRIES } from "@/consts";
 import { GetOpportunitiesParams } from "@/features/opportunities/actions/get-opportunities";
+
+// Shadcn UI
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+
+// Tus Componentes Personalizados
+import { SearchableMultiSelect } from "@/components/forms/searchable-multi-select";
+import SearchableSelect from "@/components/forms/searchable-select";
 
 interface FilterPanelProps {
   initialFilters: GetOpportunitiesParams;
@@ -17,164 +28,132 @@ export default function FilterPanel({
                                       onFilterChange,
                                       activeFiltersCount
                                     }: FilterPanelProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [localFilters, setLocalFilters] = React.useState<GetOpportunitiesParams>(initialFilters);
 
-  // Sincronizamos el estado local con los filtros que vienen de la URL (SSR)
-  const [localFilters, setLocalFilters] = useState<GetOpportunitiesParams>(initialFilters);
-
-  // Cada vez que los filtros de la URL cambian (ej. botón atrás), actualizamos el panel
-  useEffect(() => {
+  // Sincronizar estado cuando cambian los filtros externos (ej. botón atrás o tags)
+  React.useEffect(() => {
     setLocalFilters(initialFilters);
   }, [initialFilters]);
 
-  const handleCheckboxChange = (field: 'types' | 'levels', value: string) => {
-    setLocalFilters(prev => {
-      const current = (prev[field] as string[]) || [];
-      const updated = current.includes(value)
-        ? current.filter(item => item !== value)
-        : [...current, value];
-      return { ...prev, [field]: updated };
-    });
-  };
-
-  const handleApplyFilters = () => {
+  const handleApply = () => {
     onFilterChange(localFilters);
     setIsOpen(false);
   };
 
-  const handleClearFilters = () => {
-    const emptyFilters: GetOpportunitiesParams = {
+  const handleClear = () => {
+    const cleared: GetOpportunitiesParams = {
       search: undefined,
       types: [],
       levels: [],
       countries: [],
       modality: undefined,
     };
-    setLocalFilters(emptyFilters);
-    onFilterChange(emptyFilters);
-    setIsOpen(false);
+    setLocalFilters(cleared);
+    onFilterChange(cleared);
   };
 
   return (
-    <div className="w-full">
-      <div className="flex items-center gap-2 mb-4">
-        <Button
-          variant="outline"
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative flex items-center gap-2"
-        >
-          <Filter className="w-4 h-4" />
-          <span>Filtros</span>
-          {activeFiltersCount > 0 && (
-            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
-              {activeFiltersCount}
-            </span>
-          )}
-          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-        </Button>
+    <div className="space-y-4 animate-in fade-in duration-500">
+      {/* BARRA DE ACCIÓN RÁPIDA */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por título, empresa o palabras clave..."
+            className="pl-9 h-11 bg-background shadow-sm"
+            value={localFilters.search || ''}
+            onChange={(e) => setLocalFilters(prev => ({ ...prev, search: e.target.value || undefined }))}
+            onKeyDown={(e) => e.key === 'Enter' && handleApply()}
+          />
+        </div>
 
-        {activeFiltersCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={handleClearFilters} className="text-muted-foreground h-8">
-            <X className="w-3 h-3 mr-1" /> Limpiar
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button
+            variant={isOpen ? "secondary" : "outline"}
+            className="h-11 px-5"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <ListFilter className="mr-2 h-4 w-4" />
+            Filtros
+            {activeFiltersCount > 0 && (
+              <Badge variant="default" className="ml-2 h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+                {activeFiltersCount}
+              </Badge>
+            )}
           </Button>
-        )}
+
+          {activeFiltersCount > 0 && (
+            <Button variant="ghost" className="h-11 px-3 text-muted-foreground hover:text-destructive" onClick={handleClear}>
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
+      {/* PANEL EXPANDIBLE */}
       {isOpen && (
-        <div className="p-6 bg-white border rounded-xl shadow-sm animate-in fade-in zoom-in duration-200">
-          {/* Búsqueda Principal */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold mb-2">Buscar</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Título, empresa o palabras clave..."
-                value={localFilters.search || ''}
-                onChange={(e) => setLocalFilters(prev => ({ ...prev, search: e.target.value || undefined }))}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-black outline-none transition-all"
-              />
-            </div>
-          </div>
+        <Card className="border shadow-lg overflow-hidden animate-in slide-in-from-top-2 duration-300">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Tipo */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold border-b pb-1">Tipo</h4>
-              <div className="grid gap-2">
-                {OPPORTUNITY_TYPES.map(type => (
-                  <label key={type.value} className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={(localFilters.types || []).includes(type.value)}
-                      onChange={() => handleCheckboxChange('types', type.value)}
-                      className="rounded border-gray-300 text-black focus:ring-black"
-                    />
-                    <span className="text-sm group-hover:text-black transition-colors">{type.label}</span>
-                  </label>
-                ))}
+              {/* Tipos de Oportunidad */}
+              <div className="space-y-3">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tipo de Oportunidad</Label>
+                <SearchableMultiSelect
+                  options={OPPORTUNITY_TYPES}
+                  value={localFilters.types || []}
+                  onValueChange={(vals) => setLocalFilters(prev => ({ ...prev, types: vals }))}
+                  placeholder="Todos los tipos"
+                />
+              </div>
+
+              {/* Niveles Educativos */}
+              <div className="space-y-3">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Nivel Educativo</Label>
+                <SearchableMultiSelect
+                  options={LEVELS}
+                  value={localFilters.levels || []}
+                  onValueChange={(vals) => setLocalFilters(prev => ({ ...prev, levels: vals }))}
+                  placeholder="Todos los niveles"
+                />
+              </div>
+
+              {/* Modalidad */}
+              <div className="space-y-3">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Modalidad</Label>
+                <SearchableSelect
+                  options={MODALITIES}
+                  value={localFilters.modality || ''}
+                  onChange={(val) => setLocalFilters(prev => ({ ...prev, modality: val || undefined }))}
+                  placeholder="Cualquier modalidad"
+                />
+              </div>
+
+              {/* Países Elegibles */}
+              <div className="space-y-3">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">País Elegible</Label>
+                <SearchableMultiSelect
+                  options={ELEGIBLE_COUNTRIES}
+                  value={localFilters.countries || []}
+                  onValueChange={(vals) => setLocalFilters(prev => ({ ...prev, countries: vals }))}
+                  placeholder="Cualquier país"
+                />
               </div>
             </div>
 
-            {/* Niveles */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold border-b pb-1">Nivel</h4>
-              <div className="grid gap-2">
-                {LEVELS.map(level => (
-                  <label key={level.value} className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={(localFilters.levels || []).includes(level.value)}
-                      onChange={() => handleCheckboxChange('levels', level.value)}
-                      className="rounded border-gray-300 text-black focus:ring-black"
-                    />
-                    <span className="text-sm group-hover:text-black transition-colors">{level.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            <Separator className="my-6" />
 
-            {/* Modalidad */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold border-b pb-1">Modalidad</h4>
-              <select
-                value={localFilters.modality || ''}
-                onChange={(e) => setLocalFilters(prev => ({ ...prev, modality: e.target.value || undefined }))}
-                className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-black"
-              >
-                <option value="">Todas</option>
-                {MODALITIES.map(mod => (
-                  <option key={mod.value} value={mod.value}>{mod.label}</option>
-                ))}
-              </select>
+            <div className="flex justify-end items-center gap-3">
+              <Button variant="ghost" onClick={() => setIsOpen(false)}>
+                Cerrar
+              </Button>
+              <Button onClick={handleApply} className="min-w-[120px]">
+                Aplicar Filtros
+              </Button>
             </div>
-
-            {/* Países (Simplificado para el ejemplo) */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold border-b pb-1">Ubicación</h4>
-              <input
-                type="text"
-                placeholder="Ej: México, España..."
-                value={(localFilters.countries || []).join(', ')}
-                onChange={(e) => setLocalFilters(prev => ({
-                  ...prev,
-                  countries: e.target.value ? e.target.value.split(',').map(s => s.trim()) : []
-                }))}
-                className="w-full p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-          </div>
-
-          {/* Acciones del Panel */}
-          <div className="flex justify-end items-center gap-3 mt-8 pt-4 border-t">
-            <Button variant="ghost" onClick={() => setIsOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleApplyFilters} className="bg-black text-white hover:bg-gray-800">
-              Aplicar Filtros
-            </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

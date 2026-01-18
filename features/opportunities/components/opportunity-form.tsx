@@ -29,6 +29,7 @@ import SearchableSelect from "@/components/forms/searchable-select";
 import {ComboboxCreative} from "@/components/forms/combobox-creative";
 import {DatePicker} from "@/components/forms/date-picker";
 import {Opportunity} from "@prisma/client";
+import {useEffect} from "react";
 
 interface Props {
   opportunity?: Opportunity;
@@ -78,7 +79,35 @@ export default function OpportunityForm({
     }
   });
 
-  const {register, control, handleSubmit, formState: {errors, isSubmitting}} = methods;
+  const {reset, register, control, handleSubmit, formState: {errors, isSubmitting}} = methods;
+
+  useEffect(() => {
+    if (opportunity) {
+      // Transformamos el modelo de Prisma al esquema de Zod
+      reset({
+        type: opportunity.type,
+        title: opportunity.title,
+        organization: opportunity.organization || '',
+        organizationLogoUrl: opportunity.organizationLogoUrl || '',
+        url: opportunity.url || '',
+        description: opportunity.description || '',
+        location: opportunity.ubication || '', // Mapeo de ubication -> location
+        eligibleLevels: opportunity.eligibleLevels,
+        eligibleCountries: opportunity.eligibleCountries,
+        area: opportunity.fieldOfStudy || '', // Mapeo de fieldOfStudy -> area
+        requiredSkills: opportunity.requiredSkills,
+        optionalSkills: opportunity.optionalSkills,
+        modality: opportunity.modality,
+        language: opportunity.language || 'EN',
+        currency: opportunity.currency || 'USD',
+        deadline: opportunity.deadline ? new Date(opportunity.deadline) : undefined,
+        salaryRange: {
+          min: opportunity.minSalary ?? undefined,
+          max: opportunity.maxSalary ?? undefined,
+        }
+      });
+    }
+  }, [opportunity, reset]);
 
   return (
     <FormProvider {...methods}>
@@ -150,6 +179,7 @@ export default function OpportunityForm({
                       onCreate={createOrganization}
                       onSearch={searchOrganizations}
                       options={organizationOptions}
+                      image={true}
                     />
                   )}
                 />
@@ -336,7 +366,7 @@ export default function OpportunityForm({
         <div className="flex justify-end gap-4">
           <Button variant="ghost" type="button" onClick={onCancel}>Cancelar</Button>
           <Button type="submit" disabled={isSubmitting} className="min-w-[150px]">
-            {isSubmitting ? "Guardando..." : opportunity ? "Actualizar" : "Publicar"}
+            {isSubmitting ? "Guardando..." : opportunity ? "Actualizar" : "Guardar"}
           </Button>
         </div>
       </form>
