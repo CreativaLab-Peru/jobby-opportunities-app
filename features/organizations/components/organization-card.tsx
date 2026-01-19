@@ -85,12 +85,12 @@ export function OrganizationCard({ organization, onEdit, onDelete }: Organizatio
             <DropdownMenuItem onClick={() => onEdit(organization)}>
               <Pencil className="mr-2 h-4 w-4" /> Editar
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(organization.id)}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" /> Eliminar
-            </DropdownMenuItem>
+            {/*<DropdownMenuItem*/}
+            {/*  onClick={() => onDelete(organization.id)}*/}
+            {/*  className="text-destructive focus:text-destructive"*/}
+            {/*>*/}
+            {/*  <Trash2 className="mr-2 h-4 w-4" /> Eliminar*/}
+            {/*</DropdownMenuItem>*/}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

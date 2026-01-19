@@ -9,7 +9,7 @@ import { useSession } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FilterPanel from '@/components/filter-panel';
-import Pagination from '@/components/Pagination';
+import Pagination from '@/components/pagination';
 
 // Tipos del Dominio y del Action
 import { Opportunity } from "@prisma/client";

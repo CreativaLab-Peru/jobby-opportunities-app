@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { AppSidebar } from "@/components/ui/app-sidebar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import {SidebarProvider, SidebarInset, SidebarTrigger} from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserNav } from "@/components/user-nav";
+import {Separator} from "@/components/ui/separator";
 
 export default function DashboardLayout({
   children,
@@ -40,15 +41,26 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <AppSidebar />
-      <SidebarInset className="flex flex-col">
-        <div className="flex h-12 items-center justify-end px-4 border-b bg-background shrink-0">
-          <UserNav user={{ name: session.user.name, email: session.user.email }} />
-        </div>
-        <div className="flex-1 overflow-y-auto p-2 md:p-6">
-          {children}
-        </div>
-      </SidebarInset>
+      <div className="flex min-h-screen w-full"> {/* Contenedor raíz para asegurar estabilidad */}
+        <AppSidebar />
+        <SidebarInset className="flex flex-col flex-1">
+          {/* Header Superior */}
+          {/* Contenido Principal */}
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 sm:pl-64 lg:pl-60">
+            <div className="flex items-end justify-between sm:justify-between mb-6 w-full">
+              <div className="flex sm:hidden">
+                <SidebarTrigger className="-ml-1" />
+              </div>
+              <div className="text-sm text-muted-foreground hidden sm:block">
+                Levely v.1.0.0
+              </div>
+              <UserNav user={{ name: session.user.name, email: session.user.email }} />
+            </div>
+
+            {children}
+          </main>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }

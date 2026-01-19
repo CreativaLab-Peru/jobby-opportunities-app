@@ -8,7 +8,7 @@ import { useSession } from '@/lib/auth-client';
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import Pagination from '@/components/Pagination';
+import Pagination from '@/components/pagination';
 import { EmptyState } from "@/components/empty-state";
 
 // Componentes del Módulo
