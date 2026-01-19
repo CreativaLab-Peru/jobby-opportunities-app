@@ -3,7 +3,7 @@ export interface CVAnalysis {
   summary?: string;       // Resumen generado
   experience_text?: string;
   skills: string[];
-  level?: "Junior" | "Mid" | "Senior" | "Lead"; // Tipado más estricto para seniority
+  level?: "JUNIOR" | "MID" | "SENIOR" | "LEAD"; // Tipado más estricto para seniority
   location?: string;      // País o ciudad base
   countries?: string[];   // Compatibilidad con tu versión anterior
   languages?: string[];
@@ -12,7 +12,7 @@ export interface CVAnalysis {
 
 // 2. Preferencias personales del usuario (lo que busca)
 export interface UserPreferences {
-  modality?: "Remote" | "Hybrid" | "On-site";
+  modality?: "REMOTE" | "HYBRID" | "ON_SITE";
   min_salary?: number;
   currency?: string;
   field_of_study?: string;
