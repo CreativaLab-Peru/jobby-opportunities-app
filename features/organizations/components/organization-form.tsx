@@ -1,81 +1,143 @@
-"use client";
+'use client';
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Organization } from "@prisma/client";
-import {OrganizationFormValues, OrganizationSchema} from "@/features/organizations/schemas";
-import {useEffect} from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Loader2, Save, RefreshCw } from "lucide-react";
 
-interface Props {
-  organization?: Organization;
-  onSubmit: (data: OrganizationFormValues) => Promise<{ success: boolean; error?: any }>;
-  onSuccess?: () => void;
+// Actions & Types
+import { createOrganizationAction } from "../actions/create-organization-action";
+import { updateOrganizationAction } from "../actions/update-organization-action"; // Debes crear este action
+import { OrganizationFormValues, organizationSchema } from "@/features/organizations/schemas";
+import { Organization } from "@prisma/client";
+
+// UI Components
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+interface OrganizationFormProps {
+  initialData?: Organization | null;
 }
 
-export function OrganizationForm({ organization, onSubmit, onSuccess }: Props) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<OrganizationFormValues>({
-    resolver: zodResolver(OrganizationSchema),
+export function OrganizationForm({ initialData }: OrganizationFormProps) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Determinamos el modo del formulario
+  const isEditMode = !!initialData;
+
+  const form = useForm<OrganizationFormValues>({
+    resolver: zodResolver(organizationSchema),
     defaultValues: {
-      name: organization?.name || "",
-      logoUrl: organization?.logoUrl || "",
+      name: initialData?.name || "",
+      logoUrl: initialData?.logoUrl || "",
     },
   });
 
-  useEffect(() => {
-    if (organization) {
-      reset({
-        name: organization.name,
-        logoUrl: organization.logoUrl || "",
-      });
-    } else {
-      reset({
-        name: "",
-        logoUrl: "",
-      });
-    }
-  }, [organization, reset]);
+  async function onSubmit(values: OrganizationFormValues) {
+    setIsLoading(true);
+    try {
+      let result;
 
-  const onFormSubmit = async (data: OrganizationFormValues) => {
-    const result = await onSubmit(data);
-    if (result.success) {
-      if (!organization) reset();
-      onSuccess?.();
+      if (isEditMode && initialData) {
+        // Lógica de Actualización
+        result = await updateOrganizationAction(initialData.id, values.name, values.logoUrl);
+      } else {
+        // Lógica de Creación (ajustado a tu firma de action actual)
+        result = await createOrganizationAction(values.name, values.logoUrl);
+      }
+
+      if (result.success) {
+        toast.success(isEditMode ? "Cambios guardados" : "Organización creada");
+        router.push("/organizations");
+        router.refresh();
+      } else {
+        toast.error(result.error || "Ocurrió un error inesperado");
+      }
+    } catch (error) {
+      toast.error("Error de conexión con el servidor");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4 p-6 bg-white border rounded-xl shadow-sm">
-      <div>
-        <label className="block text-sm font-semibold text-gray-700">Nombre</label>
-        <input
-          {...register("name")}
-          className={`w-full p-2 border rounded mt-1 text-black ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-          placeholder="Nombre de la empresa"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre de la Organización</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Ej. Acme Corp"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
-      </div>
 
-      <div>
-        <label className="block text-sm font-semibold text-gray-700">URL del Logo (Opcional)</label>
-        <input
-          {...register("logoUrl")}
-          className="w-full p-2 border border-gray-300 rounded mt-1 text-black"
-          placeholder="https://..."
+        <FormField
+          control={form.control}
+          name="logoUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL del Logo</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://logo-url.com/imagen.png"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.logoUrl && <p className="text-red-500 text-xs mt-1">{errors.logoUrl.message}</p>}
-      </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 disabled:bg-gray-400 transition-all"
-      >
-        {isSubmitting ? "Guardando..." : organization ? "Actualizar Organización" : "Crear Organización"}
-      </button>
-    </form>
+        <div className="flex justify-end gap-4 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={isLoading}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isEditMode ? "Actualizando..." : "Guardando..."}
+              </>
+            ) : (
+              <>
+                {isEditMode ? (
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {isEditMode ? "Guardar Cambios" : "Crear Organización"}
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

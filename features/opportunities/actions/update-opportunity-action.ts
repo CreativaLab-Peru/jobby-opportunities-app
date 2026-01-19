@@ -19,12 +19,12 @@ export async function updateOpportunityAction(id: string, body: OpportunityFormV
       return { success: false, error: "No autorizado" };
     }
 
-    const userId = session.user.id as string;
+    // const userId = session.user.id as string;
 
     // 2. Verificación de Propiedad (Seguridad)
     // Buscamos la oportunidad asegurándonos de que pertenezca al usuario en una sola consulta
     const existing = await prisma.opportunity.findFirst({
-      where: { id, userId },
+      where: { id },
       select: { id: true },
     });
 

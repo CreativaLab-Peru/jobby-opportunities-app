@@ -1,10 +1,8 @@
-import { z } from "zod";
+import * as z from "zod";
 
-export const OrganizationSchema = z.object({
-  name: z.string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre es demasiado largo"),
-  logoUrl: z.string().url("URL de logo inválida").optional().or(z.literal("")),
+export const organizationSchema = z.object({
+  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
+  logoUrl: z.string().optional(),
 });
 
-export type OrganizationFormValues = z.infer<typeof OrganizationSchema>;
+export type OrganizationFormValues = z.infer<typeof organizationSchema>;

@@ -16,7 +16,7 @@ interface OpportunitiesPageProps {
 export default async function OpportunitiesPage({ searchParams }: OpportunitiesPageProps) {
   const sParams = await searchParams;
 
-  // Normalización de parámetros (asegurar arrays para Prisma)
+  // 1. Normalización de parámetros (asegurar arrays para Prisma)
   const toArray = (val: string | string[] | undefined) =>
     val ? (Array.isArray(val) ? val : [val]) : undefined;
 
@@ -30,6 +30,7 @@ export default async function OpportunitiesPage({ searchParams }: OpportunitiesP
     sortOrder: (sParams.sortOrder as "asc" | "desc") || "desc",
   };
 
+  // 2. Fetch de datos en el servidor
   const result = await getOpportunities(params);
 
   return (

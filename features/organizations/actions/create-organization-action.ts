@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCanonicalSkill } from "@/lib/matching/skills-utils";
 
-export async function createOrganizationAction(name: string) {
+export async function createOrganizationAction(name: string, logoUrl?: string){
   if (!name || name.trim().length < 2) {
     return { success: false, error: "El nombre es demasiado corto" };
   }
@@ -20,6 +20,7 @@ export async function createOrganizationAction(name: string) {
       create: {
         key: canonicalKey,
         name: displayName,
+        logoUrl: logoUrl || null,
       },
     });
 
