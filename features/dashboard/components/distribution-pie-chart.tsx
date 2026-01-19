@@ -1,6 +1,7 @@
 "use client";
 
-import { Pie, PieChart, Cell } from "recharts";
+import * as React from "react";
+import { Label, Pie, PieChart } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -15,11 +16,8 @@ interface TypeDistributionData {
   _count: { _all: number };
 }
 
+// Asegúrate de que las llaves coincidan exactamente con lo que viene en 'item.type'
 const typeConfig = {
-  count: {
-    label: "Oportunidades",
-    color: "transparent",
-  },
   INTERNSHIP: { label: "Pasantía", color: "hsl(var(--chart-1))" },
   SCHOLARSHIP: { label: "Beca", color: "hsl(var(--chart-2))" },
   EMPLOYMENT: { label: "Empleo", color: "hsl(var(--chart-3))" },
@@ -28,49 +26,63 @@ const typeConfig = {
 } satisfies ChartConfig;
 
 export function DistributionPieChart({ data }: { data: TypeDistributionData[] }) {
-  const chartData = data.map((item) => {
-    // 1. Obtenemos la clave del config
-    const configKey = item.type as keyof typeof typeConfig;
+  const totalOpportunities = React.useMemo(() => {
+    return data.reduce((acc, curr) => acc + curr._count._all, 0);
+  }, [data]);
 
-    // 2. Accedemos de forma segura al color
-    // Usamos un Type Assertion o verificamos si existe la propiedad color
-    const configItem = typeConfig[configKey];
-    const fill = (configItem && 'color' in configItem)
-      ? configItem.color
-      : "hsl(var(--chart-5))"; // Fallback por defecto
-
-    return {
+  const chartData = React.useMemo(() => {
+    return data.map((item) => ({
       type: item.type,
       count: item._count._all,
-      fill: fill,
-    };
-  });
+      // Usamos la convención de Shadcn: var(--color-LLAVE)
+      fill: `var(--color-${item.type})`,
+    }));
+  }, [data]);
 
   return (
     <ChartContainer
       config={typeConfig}
-      className="mx-auto aspect-square max-h-[300px]"
+      className="mx-auto aspect-square max-h-[350px] w-full"
     >
       <PieChart>
         <ChartTooltip
           cursor={false}
-          content={<ChartTooltipContent hideLabel />}
+          content={<ChartTooltipContent hideLabel className="min-w-[150px]" />}
         />
         <Pie
           data={chartData}
           dataKey="count"
           nameKey="type"
-          innerRadius={60}
-          strokeWidth={2}
+          innerRadius={70}
+          outerRadius={90}
+          strokeWidth={5}
           stroke="hsl(var(--background))"
+          paddingAngle={2}
         >
-          {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.fill} />
-          ))}
+          {/* IMPORTANTE: No mapeamos Cells manualmente aquí.
+             Al pasar el 'fill' en los objetos de 'chartData' con la variable CSS
+             que ChartContainer inyecta, Recharts lo reconoce automáticamente.
+          */}
+          <Label
+            content={({ viewBox }) => {
+              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                return (
+                  <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                    <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
+                      {totalOpportunities.toLocaleString()}
+                    </tspan>
+                    <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 24} className="fill-muted-foreground text-xs uppercase font-medium">
+                      Total
+                    </tspan>
+                  </text>
+                );
+              }
+            }}
+          />
         </Pie>
         <ChartLegend
           content={<ChartLegendContent nameKey="type" />}
-          className="-translate-y-2 flex-wrap"
+          className="flex-wrap gap-x-4 gap-y-2 pt-4"
         />
       </PieChart>
     </ChartContainer>
