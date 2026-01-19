@@ -1,5 +1,5 @@
-import {OrganizationsScreen} from "@/features/organizations/components/organization-screen";
 import {getOrganizationsActionsV2} from "@/features/organizations/actions/get-organizations-actions-v2";
+import {OrganizationsScreen} from "@/features/organizations/screens/organization-screen";
 
 interface PageProps {
   searchParams: Promise<{
@@ -28,6 +28,8 @@ export default async function OrganizationsPage({ searchParams }: PageProps) {
   return (
     <OrganizationsScreen
       initialData={result.data}
+      pagination={result.meta}
+      filters={filters}
     />
   );
 }

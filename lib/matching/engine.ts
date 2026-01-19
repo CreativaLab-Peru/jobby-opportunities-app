@@ -1,85 +1,176 @@
 import { cleanText, getEmbedding, cosineSimilarity } from './utils';
 import { Opportunity } from "@prisma/client";
-import {CVAnalysis} from "@/features/math/types";
+import { CVAnalysis } from "@/features/math/types";
 
-// 1. Scoring de Habilidades con Peso Diferenciado
-function skillsOverlapScore(userSkills: string[], required: string[], optional: string[]): number {
+/**
+ * Scoring de Habilidades con Lógica Difusa
+ * Mejora: Escalado suave para no penalizar tanto matches parciales
+ */
+function skillsOverlapScore(
+  userSkills: string[],
+  required: string[],
+  optional: string[]
+): number {
   const uSet = new Set(userSkills.map(s => s.toLowerCase().trim()));
 
-  // Scoring para requeridas (base del match)
-  const reqMatch = required.length > 0
-    ? required.filter(s => uSet.has(s.toLowerCase().trim())).length / required.length
-    : 1.0;
+  // Skills Requeridas con umbral de aceptación
+  let reqScore = 1.0;
+  if (required.length > 0) {
+    const matchedCount = required.filter(s =>
+      uSet.has(s.toLowerCase().trim())
+    ).length;
+    const matchRatio = matchedCount / required.length;
 
-  // Scoring para opcionales (bonus extra)
-  const optMatch = optional.length > 0
-    ? optional.filter(s => uSet.has(s.toLowerCase().trim())).length / optional.length
-    : 0;
+    // Escalado suave: 50% de match ya da 0.7 de score
+    // Esto hace que candidatos con mayoría de skills tengan buen score
+    reqScore = matchRatio >= 0.5
+      ? 0.7 + (matchRatio - 0.5) * 0.6  // [0.5-1.0] → [0.7-1.0]
+      : matchRatio * 1.4;                // [0-0.5] → [0-0.7]
+  }
 
-  // Las requeridas pesan un 80% del score de skills, las opcionales un 20%
-  return (reqMatch * 0.8) + (optMatch * 0.2);
+  // Skills Opcionales (Bonus adicional hasta 15%)
+  let optBonus = 0;
+  if (optional.length > 0) {
+    const matchedOpt = optional.filter(s =>
+      uSet.has(s.toLowerCase().trim())
+    ).length;
+    optBonus = Math.min(0.15, (matchedOpt / optional.length) * 0.15);
+  }
+
+  return Math.min(1.0, reqScore + optBonus);
 }
 
-// 2. Validación de Requisitos de Negocio
+/**
+ * Validación de Requisitos de Negocio
+ * Mejora: Penalizaciones aditivas en lugar de multiplicativas
+ */
 function hardRequirementsScore(cv: CVAnalysis, opp: Opportunity): number {
-  let score = 1.0;
+  const score = 1.0;
+  const penalties: number[] = [];
 
-  // Elegibilidad por País (Filtro Crítico)
+  // 1. Elegibilidad por País (Crítico pero no eliminatorio)
   if (opp.eligibleCountries?.length > 0) {
-    const hasCountry = cv.countries?.some(c => opp.eligibleCountries.includes(c));
-    if (!hasCountry) score *= 0.2; // Penalización severa en lugar de resta fija
+    const hasCountry = cv.countries?.some(c =>
+      opp.eligibleCountries.includes(c)
+    );
+    if (!hasCountry) {
+      penalties.push(0.15); // Penalización del 15% en lugar de 80%
+    }
   }
 
-  // Nivel de Experiencia (Seniority)
+  // 2. Nivel de Experiencia (Moderado)
   if (opp.eligibleLevels?.length > 0 && cv.level) {
-    const levelMatch = opp.eligibleLevels.some(l => l.toLowerCase() === cv.level?.toLowerCase());
-    if (!levelMatch) score *= 0.7; // Penalización moderada
+    const levelMatch = opp.eligibleLevels.some(l =>
+      l.toLowerCase() === cv.level?.toLowerCase()
+    );
+    if (!levelMatch) {
+      penalties.push(0.10); // 10% de penalización en lugar de 30%
+    }
   }
 
-  // Idioma
-  if (opp.language && !cv.languages?.some(l => l.toLowerCase() === opp.language?.toLowerCase())) {
-    score *= 0.5;
+  // 3. Idioma (Moderado-Alto)
+  if (opp.language && !cv.languages?.some(l =>
+    l.toLowerCase() === opp.language?.toLowerCase()
+  )) {
+    penalties.push(0.12); // 12% de penalización en lugar de 50%
   }
 
-  return score;
+  // Aplicamos las penalizaciones de forma aditiva
+  const totalPenalty = penalties.reduce((sum, p) => sum + p, 0);
+  return Math.max(0, score - totalPenalty);
 }
 
-// 3. Función Principal de Scoring
+/**
+ * Función Principal de Scoring
+ * Mejoras:
+ * - Verificación de normalización del cosine similarity
+ * - Pesos balanceados (35% skills, 35% semantic, 20% hard, 10% bonuses)
+ * - Sistema de compensación para candidatos fuertes
+ * - Logging para debugging
+ */
 export async function scoreOpportunity(cv: CVAnalysis, opp: Opportunity) {
   // Enriquecemos el texto de la oportunidad para el embedding
-  const oppText = cleanText(`${opp.title} ${opp.description} ${opp.requiredSkills?.join(' ')}`);
-  const cvText = cleanText(`${cv.summary} ${cv.experience_text} ${cv.skills.join(' ')}`);
+  const oppText = cleanText(
+    `${opp.title} ${opp.description} ${opp.requiredSkills?.join(' ')}`
+  );
+  const cvText = cleanText(
+    `${cv.summary} ${cv.experience_text} ${cv.skills.join(' ')}`
+  );
 
   const [embCv, embOpp] = await Promise.all([
     getEmbedding(cvText),
     getEmbedding(oppText)
   ]);
 
-  const semSim = (cosineSimilarity(embCv, embOpp) + 1) / 2;
+  // IMPORTANTE: Verificar si tu cosineSimilarity ya retorna [0,1] o [-1,1]
+  // Si ya está normalizado [0,1], NO aplicar la transformación
+  const semSim = cosineSimilarity(embCv, embOpp);
 
-  // Usamos el nuevo sistema de skills (requeridas vs opcionales)
-  const skillsScore = skillsOverlapScore(cv.skills, opp.requiredSkills || [], opp.optionalSkills || []);
+  // Descomenta la siguiente línea SOLO si cosineSimilarity retorna [-1, 1]
+  // semSim = (semSim + 1) / 2;
+
+  // Usamos el nuevo sistema de skills mejorado
+  const skillsScore = skillsOverlapScore(
+    cv.skills,
+    opp.requiredSkills || [],
+    opp.optionalSkills || []
+  );
 
   const hardScore = hardRequirementsScore(cv, opp);
 
   /**
-   * NUEVA DISTRIBUCIÓN DE PESOS:
-   * 40% Semántica: Contexto general y "vibe" del CV.
-   * 40% Skills: Es lo más tangible para el reclutador.
-   * 20% Hard Requirements: Filtros de elegibilidad.
+   * NUEVA DISTRIBUCIÓN BALANCEADA:
+   * 35% Skills: Lo más importante para recruiters
+   * 35% Semántica: Contexto y fit cultural
+   * 20% Hard Requirements: Filtros de elegibilidad
+   * 10% Bonuses: Popularidad y compensaciones
    */
-  let finalScore = (0.40 * semSim) + (0.40 * skillsScore) + (0.20 * hardScore);
+  let finalScore =
+    (0.35 * skillsScore) +
+    (0.35 * semSim) +
+    (0.20 * hardScore);
 
-  // Bonus por Popularidad (pequeño empujón a oportunidades destacadas)
+  // Bonus por Popularidad (hasta 8% adicional)
+  let popBonus = 0;
   if (opp.popularityScore > 0) {
-    finalScore += Math.min(0.05, (opp.popularityScore / 1000));
+    popBonus = Math.min(0.08, (opp.popularityScore / 500) * 0.08);
+    finalScore += popBonus;
+  }
+
+  // Sistema de Compensación: Si el candidato es muy fuerte en skills
+  // pero débil en elegibilidad, compensamos parcialmente
+  let compensationBonus = 0;
+  if (skillsScore > 0.8 && hardScore < 0.5) {
+    compensationBonus = (skillsScore - 0.8) * 0.15; // Hasta 3% extra
+    finalScore += compensationBonus;
+  }
+
+  // Bonus por semántica excepcional
+  if (semSim > 0.85) {
+    compensationBonus += 0.03;
+    finalScore += 0.03;
+  }
+
+  // Cap en 100%
+  finalScore = Math.min(1.0, finalScore);
+
+  // Logging para debugging (útil en desarrollo)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[MATCH] ${opp.title}:`, {
+      semantic: semSim.toFixed(4),
+      skills: skillsScore.toFixed(4),
+      hard: hardScore.toFixed(4),
+      popBonus: popBonus.toFixed(4),
+      compensation: compensationBonus.toFixed(4),
+      final: finalScore.toFixed(4)
+    });
   }
 
   return {
     opportunity_id: opp.id,
     title: opp.title,
     organization: opp.organization,
-    match_score: Number(Math.min(1.0, finalScore).toFixed(4)),
+    match_score: Number(finalScore.toFixed(4)),
     breakdown: {
       semantic: Number(semSim.toFixed(4)),
       skills: Number(skillsScore.toFixed(4)),

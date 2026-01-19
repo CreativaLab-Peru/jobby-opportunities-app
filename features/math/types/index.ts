@@ -1,4 +1,3 @@
-// 1. Representa el análisis extraído del CV (datos técnicos)
 export interface CVAnalysis {
   text?: string;          // Contenido completo o raw text
   summary?: string;       // Resumen generado

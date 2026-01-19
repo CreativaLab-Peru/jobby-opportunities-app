@@ -36,22 +36,24 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="none">
+    <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Briefcase className="h-4 w-4" />
+        <div className="flex items-center gap-3 px-4 py-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg">
+            <Briefcase className="h-5 w-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold">Levely</span>
-            <span className="text-xs text-muted-foreground">Admin Panel</span>
+          <div className="flex flex-col gap-0.5 overflow-hidden transition-all">
+            <span className="text-sm font-bold leading-none tracking-tight">Levely</span>
+            <span className="text-[10px] text-muted-foreground truncate">Gestión de Talento</span>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navegación</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-4 text-[10px] font-bold uppercase tracking-widest opacity-60">
+            Menú Principal
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -59,10 +61,12 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === item.href}
+                    tooltip={item.title} // Importante cuando se colapsa a iconos
+                    className="h-10 transition-colors"
                   >
-                    <Link href={item.href}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                    <Link href={item.href} className="flex items-center gap-3">
+                      <item.icon className={pathname === item.href ? "text-primary" : "text-muted-foreground"} />
+                      <span className="font-medium text-sm">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -72,12 +76,15 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-t p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleSignOut}>
+            <SidebarMenuButton
+              onClick={() => signOut()}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-all"
+            >
               <LogOut className="h-4 w-4" />
-              <span>Cerrar Sesión</span>
+              <span className="font-medium text-sm">Cerrar Sesión</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

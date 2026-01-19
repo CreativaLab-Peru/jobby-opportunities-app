@@ -7,12 +7,13 @@ Content-Type: application/json
     "summary": "Software Engineer with experience in backend development and APIs",
     "experience_text": "3 years working with Node.js, Next.js, Prisma and PostgreSQL.",
     "skills": ["Node.js", "Next.js", "Prisma", "PostgreSQL", "TypeScript"],
-    "location": "Peru",
+    "location": "MX",
     "level": "Mid",
-    "languages": ["Spanish", "English"]
+    "languages": ["ES", "EN"],
+    "type": "EMPLOYMENT"
   },
   "preferences": {
-    "modality": "Remote",
+    "modality": "REMOTE",
     "min_salary": 3000,
     "currency": "USD",
     "top_k": 5
@@ -22,63 +23,58 @@ Content-Type: application/json
   }
 }
 
-
-### Match – Junior Developer (minimal CV)
+### Match – "Senior Frontend Engineer" (Micro-frontends)
 POST http://localhost:3000/api/match/users/124/cvs/457
 Content-Type: application/json
 
 {
   "cv_data": {
-    "summary": "Junior software developer",
-    "experience_text": "Internship building small web applications using JavaScript and React.",
-    "skills": ["JavaScript", "React"],
-    "level": "Junior"
+    "summary": "Senior Frontend Developer specialized in React and architecture.",
+    "skills": ["react", "ts", "graphql", "liderazgo"],
+    "level": "Senior",
+    "location": "PE",
+    "type": "EMPLOYMENT"
   },
   "preferences": {
-    "top_k": 3
-  },
-  "filters": {
-    "only_eligible": true
+    "modality": "ON_SITE",
+    "top_k": 1
   }
 }
 
-### Match – Data / AI profile
+### Match – "Director Creativo de Marca" (Remoto)
 POST http://localhost:3000/api/match/users/128/cvs/461
 Content-Type: application/json
 
 {
   "cv_data": {
-    "text": "Full original CV text here...",
-    "summary": "Senior software architect with 10+ years of experience",
-    "experience_text": "Designed scalable systems and led engineering teams.",
-    "skills": ["System Design", "Microservices", "Node.js", "AWS", "PostgreSQL"],
-    "location": "USA",
+    "summary": "Brand Director with experience in SaaS and storytelling.",
+    "skills": ["figmastorytelling", "adobecreativecloud"],
     "level": "Senior",
-    "languages": ["English", "Spanish"]
+    "location": "ES",
+    "type": "EMPLOYMENT"
   },
   "preferences": {
-    "field_of_study": "Computer Science",
-    "top_k": 5
+    "modality": "REMOTE",
+    "min_salary": 7000
   }
 }
 
 
-### Match – Non-technical (Humanities / Scholarships)
+### Match – "Practicante de Data Science" (Junior/Intern)
 POST http://localhost:3000/api/match/users/126/cvs/459
 Content-Type: application/json
 
 {
-  "top_k": 5,
-  "cv": {
-    "summary": "Humanities student interested in international scholarships",
-    "experience_text": "Participated in research projects related to history and cultural studies.",
-    "skills": [
-      "Academic Research",
-      "Writing",
-      "Critical Thinking"
-    ],
-    "countries": ["Peru"],
-    "languages": ["Spanish"]
+  "cv_data": {
+    "summary": "Estudiante de ingeniería buscando prácticas en datos.",
+    "skills": ["python", "sql", "excelavanzado"],
+    "level": "Junior",
+    "location": "PE",
+    "type": "INTERNSHIP"
+  },
+  "preferences": {
+    "modality": "ON_SITE",
+    "top_k": 3
   }
 }
 
@@ -92,70 +88,45 @@ Content-Type: application/json
     "experience_text": "Managed social media campaigns, SEO strategies, and Google Ads for small businesses.",
     "skills": ["Digital Marketing", "SEO", "Google Ads", "Content Strategy"],
     "languages": ["Spanish", "English"],
-    "level": "Mid"
+    "level": "Mid",
+    "type": "EMPLOYMENT"
   },
   "preferences": {
     "top_k": 4,
-    "modality": "Hybrid"
+    "modality": "HYBRID"
   }
 }
 
 ### Match – Very senior / broad experience
+### Caso A: Incompatibilidad de Ubicación (Filtro eligibleCountries)
+### Aquí el usuario está en Argentina (AR), pero ninguna de tus oportunidades listadas incluye a AR en su arreglo de países elegibles.
 POST http://localhost:3000/api/match/users/128/cvs/461
 Content-Type: application/json
 
 {
   "cv_data": {
-    "summary": "Senior software architect with 10+ years of experience",
-    "experience_text": "Designed scalable systems, led engineering teams, and defined backend architectures.",
-    "skills": ["System Design", "Microservices", "Node.js", "AWS", "PostgreSQL"],
-    "location": "Peru",
-    "level": "Senior",
-    "languages": ["English", "Spanish"]
+    "summary": "Desarrollador de software en Argentina.",
+    "skills": ["react", "node"],
+    "location": "AR"
   },
   "preferences": {
-    "top_k": 5,
-    "min_salary": 8000,
-    "currency": "USD"
-  },
-  "filters": {
-    "exclude_expired": true
+    "modality": "REMOTE"
   }
 }
 
 ### Match – Edge case (empty skills array)
+### Aquí el usuario busca una Beca (SCHOLARSHIP) pero exige que sea Presencial (ON_SITE).
+### Tu única beca disponible (BECA UNSAAC TEST 1) es estrictamente REMOTE.
 POST http://localhost:3000/api/match/users/129/cvs/462
 Content-Type: application/json
 
 {
   "cv_data": {
-    "summary": "Student exploring opportunities",
-    "experience_text": "Currently studying and exploring different fields.",
-    "skills": [],
-    "languages": ["Spanish"],
-    "level": "Junior"
+    "summary": "Estudiante buscando becas presenciales.",
+    "skills": ["investigacion"],
+    "type": "SCHOLARSHIP"
   },
   "preferences": {
-    "top_k": 5
-  },
-  "filters": {
-    "only_eligible": true
-  }
-}
-
-### Match – Different top_k (stress ranking)
-POST http://localhost:3000/api/match/users/130/cvs/463
-Content-Type: application/json
-
-{
-  "cv_data": {
-    "summary": "Backend developer interested in scholarships and internships",
-    "experience_text": "Experience with REST APIs, databases, and cloud deployment.",
-    "skills": ["Node.js", "REST APIs", "SQL", "Docker"],
-    "level": "Junior"
-  },
-  "preferences": {
-    "top_k": 10,
-    "field_of_study": "Computer Science"
+    "modality": "ON_SITE"
   }
 }
