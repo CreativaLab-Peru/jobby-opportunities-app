@@ -23,6 +23,7 @@ export const opportunitySchema = z.object({
     min: z.coerce.number().optional(),
     max: z.coerce.number().optional(),
   }).optional(),
+  yearSalary: z.coerce.number().optional(),
   deadline: z.date().optional(),
 });
 
