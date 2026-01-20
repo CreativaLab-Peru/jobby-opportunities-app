@@ -28,15 +28,15 @@ export async function upsertOpportunityAction(body: OpportunityFormValues, id?: 
     const normalizedSkills = Array.from(new Set(rawSkills.map(getCanonicalSkill)));
 
     // Upsert de Tags (Master Data)
-    // await Promise.all(
-    //   normalizedSkills.map(skillName =>
-    //     prisma.tag.upsert({
-    //       where: { name: skillName },
-    //       update: {},
-    //       create: { name: skillName, category: "skill" }
-    //     })
-    //   )
-    // );
+    await Promise.all(
+      normalizedSkills.map(skillName =>
+        prisma.tag.upsert({
+          where: { name: skillName },
+          update: {},
+          create: { name: skillName, category: "skill" }
+        })
+      )
+    );
 
     // Blind organization logo URL if organization is provided
     if (body.organization) {
@@ -73,6 +73,7 @@ export async function upsertOpportunityAction(body: OpportunityFormValues, id?: 
       // Finanzas
       minSalary: body.salaryRange?.min ?? null,
       maxSalary: body.salaryRange?.max ?? null,
+      yearSalary: body.yearSalary ?? null,
       currency: body.currency || "USD",
 
       searchVector: generateSearchVector({

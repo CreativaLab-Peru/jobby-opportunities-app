@@ -75,6 +75,7 @@ export async function updateOpportunityAction(id: string, body: OpportunityFormV
         // Finanzas (Zod ya garantiza que son números o undefined)
         minSalary: body.salaryRange?.min ?? null,
         maxSalary: body.salaryRange?.max ?? null,
+        yearSalary: body.yearSalary ?? null,
         currency: body.currency || "USD",
 
         // Re-generación del motor de búsqueda

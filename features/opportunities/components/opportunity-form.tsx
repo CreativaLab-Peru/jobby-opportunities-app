@@ -104,7 +104,8 @@ export default function OpportunityForm({
         salaryRange: {
           min: opportunity.minSalary ?? undefined,
           max: opportunity.maxSalary ?? undefined,
-        }
+        },
+        yearSalary: opportunity.yearSalary ?? undefined,
       });
     }
   }, [opportunity, reset]);
@@ -350,7 +351,7 @@ export default function OpportunityForm({
                 />
               </FormField>
               <FormField label="Monto Total">
-                <Input type="number" {...register('fundingAmount')} placeholder="0.00"/>
+                <Input type="number" {...register('yearSalary')} placeholder="0.00"/>
               </FormField>
               <FormField label="Salario Min">
                 <Input type="number" {...register('salaryRange.min')} placeholder="Mínimo"/>

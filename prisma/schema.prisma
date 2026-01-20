@@ -71,9 +71,10 @@ model Opportunity {
   optionalSkills    String[]
 
   // ---- Finanzas Denormalizadas ----
-  minSalary Float?
-  maxSalary Float?
-  currency  String? @default("USD")
+  yearSalary Float?
+  minSalary  Float?
+  maxSalary  Float?
+  currency   String? @default("USD")
 
   // ---- Metadata de búsqueda ----
   searchVector    String? // Consolidado de title + description para IA
