@@ -181,9 +181,23 @@ export async function POST(
     // Full details con info de organización
     const resultsDetails = [];
     for (const match of sortedResults) {
-      if (!match.organization) continue;
+      // Skill labels
+      const requiredSkillKeys = match.details.requiredSkills;
+      const optionalSkillKeys = match.details.optionalSkills;
+
+      const requiredSkills = await prisma.skill.findMany({
+        where: {key: {in: requiredSkillKeys}}
+      })
+      const optionalSkills = await prisma.skill.findMany({
+        where: {key: {in: optionalSkillKeys}}
+      })
+      match.details.requiredSkills = requiredSkills.map(s=> s.name);
+      match.details.optionalSkills = optionalSkills.map(s=> s.name);
+
+      // Match opportunity
+      if (!match.details.organization) continue;
       const org = await prisma.organization.findUnique({
-        where: {key: match.organization}
+        where: {key: match.details.organization}
       });
       if (!org) {
         continue;
