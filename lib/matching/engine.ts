@@ -201,7 +201,7 @@ export async function scoreOpportunity(cv: CVAnalysis, opp: Opportunity) {
       salary: {
         min: opp.minSalary,
         max: opp.maxSalary,
-        anual: opp.yearSalary,
+        annual: opp.yearSalary,
         currency: opp.currency,
       },
       popularity: opp.popularityScore,

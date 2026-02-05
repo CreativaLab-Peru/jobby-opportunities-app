@@ -187,10 +187,10 @@ export async function POST(
 
       const requiredSkills = await prisma.skill.findMany({
         where: {key: {in: requiredSkillKeys}}
-      })
+      });
       const optionalSkills = await prisma.skill.findMany({
         where: {key: {in: optionalSkillKeys}}
-      })
+      });
       match.details.requiredSkills = requiredSkills.map(s=> s.name);
       match.details.optionalSkills = optionalSkills.map(s=> s.name);
 
