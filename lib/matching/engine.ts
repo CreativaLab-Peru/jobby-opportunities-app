@@ -168,25 +168,45 @@ export async function scoreOpportunity(cv: CVAnalysis, opp: Opportunity) {
 
   return {
     opportunity_id: opp.id,
-    title: opp.title,
-    organization: opp.organization,
     match_score: Number(finalScore.toFixed(4)),
+
+    // Metadatos para el frontend
     breakdown: {
       semantic: Number(semSim.toFixed(4)),
       skills: Number(skillsScore.toFixed(4)),
       eligibility: Number(hardScore.toFixed(4))
     },
-    // Metadatos para el frontend
+
+    // Detalles de la oportunidad
     details: {
+      type: opp.type,
+      title: opp.title,
+      organization: opp.organization,
+      organizationLogoUrl: opp.organizationLogoUrl,
+      url: opp.url,
+      description: opp.description,
+      language: opp.language,
+      ubication: opp.ubication,
+      fieldOfStudy: opp.fieldOfStudy,
+
       modality: opp.modality,
-      deadline: opp.deadline,
+      status: opp.status,
+
+      eligibleLevels: opp.eligibleLevels,
+      eligibleCountries: opp.eligibleCountries,
+
+      requiredSkills: opp.requiredSkills,
+      optionalSkills: opp.optionalSkills,
+
       salary: {
         min: opp.minSalary,
-        max: opp.maxSalary
+        max: opp.maxSalary,
+        annual: opp.yearSalary,
+        currency: opp.currency,
       },
-      currency: opp.currency,
-      url: opp.url,
       popularity: opp.popularityScore,
+
+      deadline: opp.deadline,
     }
   };
 }
