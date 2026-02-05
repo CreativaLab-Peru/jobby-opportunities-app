@@ -182,7 +182,6 @@ export async function scoreOpportunity(cv: CVAnalysis, opp: Opportunity) {
       type: opp.type,
       title: opp.title,
       organization: opp.organization,
-      organizationLogoUrl: opp.organizationLogoUrl,
       url: opp.url,
       description: opp.description,
       language: opp.language,

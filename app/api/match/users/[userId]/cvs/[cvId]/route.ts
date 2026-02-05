@@ -206,8 +206,10 @@ export async function POST(
         ...match,
         details: {
           ...match.details,
-          organization_name: org.name,
-          organization_logo: org.logoUrl || null
+          organization: {
+            organization_name: org.name,
+            organization_logo: org.logoUrl || null
+          }
         }
       });
     }
