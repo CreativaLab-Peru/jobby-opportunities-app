@@ -1,3 +1,5 @@
+"use server";
+
 import {getCanonicalSkill} from "@/lib/matching/skills-utils";
 import {prisma} from "@/lib/prisma";
 
@@ -10,6 +12,7 @@ export async function updateOrganizationAction(id: string, newName: string, logo
     });
     return { success: true, data: updated };
   } catch (error) {
+    console.log("[ERROR_UPDATE_ORGANIZATION]", error);
     return { success: false, error: "Error al actualizar" };
   }
 }

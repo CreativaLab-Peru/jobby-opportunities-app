@@ -59,8 +59,8 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
 
       if (result.success) {
         toast.success(isEditMode ? "Cambios guardados" : "Organización creada");
-        router.push("/organizations");
         router.refresh();
+        router.push("/organizations");
       } else {
         toast.error(result.error || "Ocurrió un error inesperado");
       }
