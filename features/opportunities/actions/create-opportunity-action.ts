@@ -61,6 +61,7 @@ export async function upsertOpportunityAction(body: OpportunityFormValues, id?: 
       language: body.language || "ES",
       ubication: body.location || null, // Mapeo correcto a Prisma
       fieldOfStudy: body.area || null,   // Mapeo correcto a Prisma
+      areas: body.areas || [],
 
       modality: (body.modality as Modality) || "ON_SITE",
 

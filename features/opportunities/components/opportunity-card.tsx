@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {OPPORTUNITY_TYPES} from "@/consts";
 
 interface OpportunityCardProps {
   opportunity: Opportunity;
@@ -43,6 +44,8 @@ export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCa
       maximumFractionDigits: 0
     }).format(amount);
   };
+
+  const typeMapped = OPPORTUNITY_TYPES.find(type => type.value === opportunity.type);
 
   return (
     <div className={cn(
@@ -63,7 +66,7 @@ export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCa
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider">
-                {opportunity.type}
+                {typeMapped?.label || opportunity.type}
               </Badge>
               {opportunity.modality === 'REMOTE' && (
                 <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-100 text-[10px]">

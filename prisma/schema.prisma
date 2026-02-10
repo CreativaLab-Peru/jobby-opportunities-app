@@ -59,6 +59,7 @@ model Opportunity {
   language            String?         @default("EN") // ISO 639-1
   ubication           String? // Ciudad, País de la oportunidad
   fieldOfStudy        String? // Area
+  areas               String[] // ["software", "data_science"]
 
   // ---- Clasificación Estricta ----
   modality Modality          @default(ON_SITE)

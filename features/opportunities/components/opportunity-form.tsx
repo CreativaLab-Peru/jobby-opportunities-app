@@ -75,7 +75,7 @@ export default function OpportunityForm({
       modality: '', language: '', currency: 'USD', deadline: undefined,
       fundingAmount: undefined,
       salaryRange: {min: undefined, max: undefined},
-      area: '',
+      areas: [],
     }
   });
 
@@ -106,6 +106,7 @@ export default function OpportunityForm({
           max: opportunity.maxSalary ?? undefined,
         },
         yearSalary: opportunity.yearSalary ?? undefined,
+        areas: opportunity.areas || [],
       });
     }
   }, [opportunity, reset]);
@@ -148,18 +149,18 @@ export default function OpportunityForm({
               <FormField label="Título *" error={errors.title?.message}>
                 <Input {...register('title')} placeholder="Ej: Beca de Postgrado"/>
               </FormField>
-              <FormField label="Área de Conocimiento *" error={errors.area?.message}>
+              <FormField label="Área de Conocimiento *" error={errors.areas?.message}>
                 <Controller
                   control={control}
-                  name="area"
+                  name="areas"
                   render={({field}) => (
-                    <ComboboxCreative
-                      onChange={field.onChange}
+                    <SearchableMultiSelect
+                      options={areaOptions}
                       value={field.value}
-                      placeholder="Seleccionar área..."
+                      onValueChange={field.onChange}
+                      placeholder="Ej: Ingeniería, Ciencias Sociales..."
                       onCreate={createArea}
                       onSearch={searchAreas}
-                      options={areaOptions}
                     />
                   )}
                 />

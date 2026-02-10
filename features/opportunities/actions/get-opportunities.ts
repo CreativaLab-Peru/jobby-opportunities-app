@@ -84,9 +84,41 @@ export async function getOpportunities(
       prisma.opportunity.count({ where }),
     ]);
 
+    // Map of skills to their names for enrichment
+    const skillKeys = new Set<string>();
+    items.forEach(item => {
+      item.requiredSkills.forEach(skill => skillKeys.add(skill));
+      item.optionalSkills.forEach(skill => skillKeys.add(skill));
+    });
+
+    const skills = await prisma.skill.findMany({
+      where: { key: { in: Array.from(skillKeys) } },
+    });
+    const skillMap = new Map(skills.map(skill => [skill.key, skill.name]));
+    const enrichedItems = items.map(item => ({
+      ...item,
+      requiredSkills: item.requiredSkills.map(skill => skillMap.get(skill) || skill),
+      optionalSkills: item.optionalSkills.map(skill => skillMap.get(skill) || skill ),
+    }));
+
+    // Map of organizations
+    const orgKeys = new Set<string>();
+    items.forEach(item => {
+      if (item.organization) orgKeys.add(item.organization);
+    });
+    const organizations = await prisma.organization.findMany({
+      where: { key: { in: Array.from(orgKeys) } },
+    });
+
+    const orgMap = new Map(organizations.map(org => [org.key, org.name]));
+    const fullyEnrichedItems = enrichedItems.map(item => ({
+      ...item,
+      organization: item.organization ? orgMap.get(item.organization) || item.organization : null,
+    }));
+
     return {
       success: true,
-      data: items,
+      data: fullyEnrichedItems,
       pagination: {
         total,
         page,
