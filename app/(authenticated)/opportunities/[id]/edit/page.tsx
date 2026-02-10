@@ -41,16 +41,18 @@ export default async function EditOpportunityPage({ params }: Props) {
   }
 
   // Get area
-  const currentKeyArea = opportunity.fieldOfStudy;
-  if (currentKeyArea) {
-    const areaSkill = await prisma.area.findUnique({
-      where: { key: currentKeyArea },
+  const currentKeyAreas = opportunity.areas;
+  if (currentKeyAreas.length > 0) {
+    const areaSkill = await prisma.area.findMany({
+      where: { key: { in: currentKeyAreas } },
     });
     if (areaSkill) {
-      const areaOption = { value: areaSkill.key, label: areaSkill.name };
-      if (!initialAreaOptions.find(opt => opt.value === areaOption.value)) {
-        initialAreaOptions.push(areaOption);
-      }
+      areaSkill.forEach(area => {
+        const areaOption = { value: area.key, label: area.name };
+        if (!initialAreaOptions.find(opt => opt.value === areaOption.value)) {
+          initialAreaOptions.push(areaOption);
+        }
+      })
     }
   }
 
