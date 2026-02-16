@@ -61,9 +61,9 @@ export async function POST(
 
     // Filtro de elegibilidad por ubicación (más flexible)
     // Ahora acepta matches parciales con OR en lugar de filtro estricto
-    if (cvData?.location) {
-      whereClause.eligibleCountries = {has: cvData.location};
-    }
+    // if (cvData?.location) {
+    //   whereClause.eligibleCountries = {has: cvData.location};
+    // }
 
     // Filtro por tipo (solo si se especifica)
     if (cvData?.type) {
