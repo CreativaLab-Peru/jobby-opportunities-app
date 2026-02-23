@@ -3,6 +3,7 @@ export const OPPORTUNITY_TYPES = [
   {value: 'INTERNSHIP', label: 'Pasantía'},
   {value: 'EXCHANGE_PROGRAM', label: 'Intercambio'},
   {value: 'EMPLOYMENT', label: 'Empleo'},
+  {value: 'STARTUP', label: 'Acelerador'},
 ];
 
 export const LEVELS = [
