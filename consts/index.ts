@@ -90,3 +90,41 @@ export const LANGUAGES = [
   {value: 'JA', label: 'Japonés'},
   {value: 'RU', label: 'Ruso'}
 ];
+
+export const KNOWLEDGE_AREAS: {
+  value: string;
+  label: string;
+}[] = [
+  {
+    value: 'ARTIFICIAL_INTELLIGENCE',
+    label: 'Inteligencia Artificial (ML, Deep Learning, NLP, Computer Vision)'
+  },
+  {
+    value: 'DATA_SCIENCE_QUANT',
+    label: 'Ciencia de Datos & Quantitative Finance (Analytics, Econometrics, FinTech)'
+  },
+  {
+    value: 'INNOVATION_ENTREPRENEURSHIP',
+    label: 'Innovación & Emprendimiento (Startups, Venture Building, Product Strategy)'
+  },
+  {
+    value: 'PUBLIC_POLICY',
+    label: 'Políticas Públicas (AI Regulation, Global Affairs, Governance)'
+  },
+  {
+    value: 'SUSTAINABILITY_CLIMATE_TECH',
+    label: 'Sostenibilidad & Economía Circular (Climate Tech, Green Innovation)'
+  },
+  {
+    value: 'CREATIVE_TECH',
+    label: 'Creatividad Digital & Multimedia (UX, Design Systems, Branding)'
+  },
+  {
+    value: 'ENGINEERING_SYSTEMS',
+    label: 'Ingeniería, Infraestructura y Sistemas (Industrial, Energía, Supply Chain)'
+  },
+  {
+    value: 'HEALTH_BIOTECH',
+    label: 'Salud, BioTech & Bienestar (HealthTech, Bioinformatics)'
+  }
+];

@@ -8,7 +8,7 @@ import {
   OPPORTUNITY_TYPES,
   CURRENCIES,
   MODALITIES,
-  LANGUAGES
+  LANGUAGES, KNOWLEDGE_AREAS
 } from "@/consts";
 import {
   OpportunityFormValues,
@@ -106,7 +106,6 @@ export default function OpportunityForm({
           max: opportunity.maxSalary ?? undefined,
         },
         yearSalary: opportunity.yearSalary ?? undefined,
-        areas: opportunity.areas || [],
       });
     }
   }, [opportunity, reset]);
@@ -123,7 +122,10 @@ export default function OpportunityForm({
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Fila 1: Tipo y Título */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField label="Título *" error={errors.title?.message}>
+                <Input {...register('title')} placeholder="Ej: Beca de Postgrado"/>
+              </FormField>
               <FormField label="Tipo de Oportunidad *" error={errors.type?.message}>
                 <Controller
                   control={control}
@@ -145,22 +147,17 @@ export default function OpportunityForm({
             </div>
 
             {/* Fila 2: Área y Organización */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Título *" error={errors.title?.message}>
-                <Input {...register('title')} placeholder="Ej: Beca de Postgrado"/>
-              </FormField>
+            <div className="grid grid-cols-1 gap-6">
               <FormField label="Área de Conocimiento *" error={errors.areas?.message}>
                 <Controller
                   control={control}
-                  name="areas"
+                  name="area"
                   render={({field}) => (
-                    <SearchableMultiSelect
-                      options={areaOptions}
+                    <SearchableSelect
+                      options={KNOWLEDGE_AREAS}
                       value={field.value}
-                      onValueChange={field.onChange}
+                      onChange={field.onChange}
                       placeholder="Ej: Ingeniería, Ciencias Sociales..."
-                      onCreate={createArea}
-                      onSearch={searchAreas}
                     />
                   )}
                 />
