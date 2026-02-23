@@ -1,13 +1,23 @@
 export interface CVAnalysis {
-  text?: string;          // Contenido completo o raw text
   summary?: string;       // Resumen generado
   experience_text?: string;
   skills: string[];
-  level?: "JUNIOR" | "MID" | "SENIOR" | "LEAD"; // Tipado más estricto para seniority
+  level?: 'INTERN' |
+    'JUNIOR' |
+    'MID' |
+    'SENIOR' |
+    'LEAD' |
+    'EXECUTIVE' |
+    'GRADUATE' |
+    'BACHELOR' |
+    'LICENSE' |
+    'MASTER' |
+    'PHD' |
+    'POSTDOC';
   location?: string;      // País o ciudad base
   countries?: string[];   // Compatibilidad con tu versión anterior
   languages?: string[];
-  type?: string;
+  type?: 'SCHOLARSHIP' | 'INTERNSHIP' | 'EXCHANGE_PROGRAM' | 'EMPLOYMENT';
 }
 
 // 2. Preferencias personales del usuario (lo que busca)
