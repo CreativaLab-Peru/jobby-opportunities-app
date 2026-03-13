@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { generateSearchVector } from "@/lib/matching/utils";
+import { sanitizeHtmlString, stripHtml } from '@/lib/sanitize';
 import { getCanonicalSkill } from "@/lib/matching/skills-utils";
 import { getSession } from "@/features/auth/actions/get-session";
 import { revalidatePath } from "next/cache";
@@ -51,13 +52,15 @@ export async function upsertOpportunityAction(body: OpportunityFormValues, id?: 
     }
 
     // 3. Preparación del objeto de datos (Mapeo Schema -> Prisma)
+    const cleanDescription = sanitizeHtmlString(body.description || '');
+
     const opportunityData = {
       type: body.type as OpportunityType,
       title: body.title,
       organization: body.organization,
       organizationLogoUrl: body.organizationLogoUrl || null,
       url: body.url || "",
-      description: body.description,
+      description: cleanDescription,
       language: body.language || "ES",
       ubication: body.location || null, // Mapeo correcto a Prisma
       fieldOfStudy: body.area || null,   // Mapeo correcto a Prisma
@@ -79,7 +82,7 @@ export async function upsertOpportunityAction(body: OpportunityFormValues, id?: 
 
       searchVector: generateSearchVector({
         title: body.title,
-        description: body.description,
+        description: stripHtml(cleanDescription),
         organization: body.organization,
         skills: normalizedSkills
       }),
