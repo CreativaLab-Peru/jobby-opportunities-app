@@ -7,16 +7,14 @@ export const OPPORTUNITY_TYPES = [
 ];
 
 export const LEVELS = [
-  {value: 'INTERN', label: 'Practicante'},
-  {value: 'JUNIOR', label: 'Junior'},
-  {value: 'MID', label: 'Medio'},
-  {value: 'SENIOR', label: 'Senior'},
-  {value: 'LEAD', label: 'Lider'},
-  {value: 'EXECUTIVE', label: 'Ejecutivo'},
+  {value: 'SECONDARY', label: 'Secundaria / Educación Media'},
+  {value: 'TECHNICAL', label: 'Técnico'},
+  {value: 'UNDERGRADUATE_IN_PROGRESS', label: 'Universitario en curso'},
   {value: 'GRADUATE', label: 'Egresado'},
-  {value: 'BACHELOR', label: 'Bachillerato'},
-  {value: 'LICENSE', label: 'Licenciatura'},
-  {value: 'MASTER', label: 'Maestria'},
+  {value: 'BACHELOR', label: 'Bachiller'},
+  {value: 'LICENSE', label: 'Titulado / Licenciatura'},
+  {value: 'SPECIALIZATION', label: 'Especialización'},
+  {value: 'MASTER', label: 'Maestría'},
   {value: 'PHD', label: 'Doctorado'},
   {value: 'POSTDOC', label: 'Postdoctorado'},
 ];

@@ -1,6 +1,7 @@
 'use client';
 
 import {useForm, FormProvider, Controller} from 'react-hook-form';
+import type { Resolver } from 'react-hook-form';
 import {zodResolver} from "@hookform/resolvers/zod";
 import {
   ELEGIBLE_COUNTRIES,
@@ -18,7 +19,7 @@ import {
 // Shadcn UI
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {Textarea} from "@/components/ui/textarea";
+// Textarea removed: replaced by ReactQuill rich-text editor
 import {Label} from "@/components/ui/label";
 import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
 
@@ -30,6 +31,7 @@ import {ComboboxCreative} from "@/components/forms/combobox-creative";
 import {DatePicker} from "@/components/forms/date-picker";
 import {Opportunity} from "@prisma/client";
 import {useEffect} from "react";
+import { RichTextEditor } from "@/components/forms/rich-text-editor";
 
 interface Props {
   opportunity?: Opportunity;
@@ -57,17 +59,14 @@ export default function OpportunityForm({
                                           onSubmit,
                                           onCancel,
                                           skillsOptions,
-                                          areaOptions,
                                           createSkill,
                                           searchSkills,
-                                          createArea,
-                                          searchAreas,
                                           organizationOptions,
                                           searchOrganizations,
                                           createOrganization
                                         }: Props) {
   const methods = useForm<OpportunityFormValues>({
-    resolver: zodResolver(opportunitySchema as any),
+    resolver: zodResolver(opportunitySchema) as unknown as Resolver<OpportunityFormValues>,
     defaultValues: {
       type: '', title: '', organization: '', url: '', description: '',
       eligibleLevels: [], eligibleCountries: [], tags: [],
@@ -84,13 +83,22 @@ export default function OpportunityForm({
   useEffect(() => {
     if (opportunity) {
       // Transformamos el modelo de Prisma al esquema de Zod
+      // If stored description is plain text (no HTML tags) wrap and escape it so the editor shows it
+      const isHtml = (str?: string) => !!str && /<[^>]+>/.test(str);
+      const escapeHtml = (str: string) =>
+        str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      const descriptionHtml = opportunity.description
+        ? (isHtml(opportunity.description) ? opportunity.description : `<p>${escapeHtml(opportunity.description)}</p>`)
+        : '';
+
       reset({
         type: opportunity.type,
         title: opportunity.title,
         organization: opportunity.organization || '',
         organizationLogoUrl: opportunity.organizationLogoUrl || '',
         url: opportunity.url || '',
-        description: opportunity.description || '',
+        description: descriptionHtml,
         location: opportunity.ubication || '', // Mapeo de ubication -> location
         eligibleLevels: opportunity.eligibleLevels,
         eligibleCountries: opportunity.eligibleCountries,
@@ -109,6 +117,23 @@ export default function OpportunityForm({
       });
     }
   }, [opportunity, reset]);
+
+  // Quill config: toolbar options and allowed formats
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['blockquote', 'code-block'],
+      ['link'],
+      ['clean']
+    ]
+  };
+
+  const quillFormats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'blockquote', 'code-block', 'link'
+  ];
 
   return (
     <FormProvider {...methods}>
@@ -189,8 +214,17 @@ export default function OpportunityForm({
             </div>
 
             <FormField label="Descripción" error={errors.description?.message}>
-              <Textarea {...register('description')} placeholder="Breve resumen de la oportunidad..."
-                        className="min-h-[120px]"/>
+              <Controller
+                control={control}
+                name="description"
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value || ''}
+                    onChange={field.onChange}
+                    placeholder="Breve resumen de la oportunidad..."
+                  />
+                )}
+              />
             </FormField>
           </CardContent>
         </Card>

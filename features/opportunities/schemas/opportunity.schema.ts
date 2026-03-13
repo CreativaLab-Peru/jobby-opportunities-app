@@ -6,7 +6,9 @@ export const opportunitySchema = z.object({
   organization: z.string().min(1, "La organización es requerida"),
   organizationLogoUrl: z.string().optional(),
   url: z.string().optional(),
-  description: z.string().optional(),
+  // Now supports sanitized HTML produced by the rich-text editor (ReactQuill).
+  // Stored value must be a string containing HTML. We keep a reasonable max length.
+  description: z.string().max(20000, "La descripción es demasiado larga").optional(),
   location: z.string().optional(),
   eligibleLevels: z.array(z.string()).default([]),
   eligibleCountries: z.array(z.string()).default([]),

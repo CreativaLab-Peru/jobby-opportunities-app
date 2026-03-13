@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/features/auth/actions/get-session";
 import { generateSearchVector } from "@/lib/matching/utils";
+import { sanitizeHtmlString, stripHtml } from '@/lib/sanitize';
 import { getCanonicalSkill } from "@/lib/matching/skills-utils";
 import { OpportunityFormValues } from "@/features/opportunities/schemas/opportunity.schema";
 import { Modality, OpportunityType } from "@prisma/client";
@@ -52,6 +53,8 @@ export async function updateOpportunityAction(id: string, body: OpportunityFormV
     }
 
     // 4. Ejecución de la Actualización
+    const cleanDescription = sanitizeHtmlString(body.description || '');
+
     const opportunity = await prisma.opportunity.update({
       where: { id },
       data: {
@@ -60,7 +63,7 @@ export async function updateOpportunityAction(id: string, body: OpportunityFormV
         organization: body.organization,
         organizationLogoUrl: body.organizationLogoUrl || null,
         url: body.url || "",
-        description: body.description,
+        description: cleanDescription,
         language: body.language || "ES",
         ubication: body.location || null, // Mapeo Schema -> Prisma
         fieldOfStudy: body.area || null,   // Mapeo Schema -> Prisma
@@ -81,7 +84,7 @@ export async function updateOpportunityAction(id: string, body: OpportunityFormV
         // Re-generación del motor de búsqueda
         searchVector: generateSearchVector({
           title: body.title,
-          description: body.description,
+          description: stripHtml(cleanDescription),
           organization: body.organization,
           skills: normalizedSkills
         }),
