@@ -3,19 +3,18 @@ export const OPPORTUNITY_TYPES = [
   {value: 'INTERNSHIP', label: 'Pasantía'},
   {value: 'EXCHANGE_PROGRAM', label: 'Intercambio'},
   {value: 'EMPLOYMENT', label: 'Empleo'},
+  {value: 'STARTUP', label: 'Acelerador'},
 ];
 
 export const LEVELS = [
-  {value: 'INTERN', label: 'Practicante'},
-  {value: 'JUNIOR', label: 'Junior'},
-  {value: 'MID', label: 'Medio'},
-  {value: 'SENIOR', label: 'Senior'},
-  {value: 'LEAD', label: 'Lider'},
-  {value: 'EXECUTIVE', label: 'Ejecutivo'},
+  {value: 'SECONDARY', label: 'Secundaria / Educación Media'},
+  {value: 'TECHNICAL', label: 'Técnico'},
+  {value: 'UNDERGRADUATE_IN_PROGRESS', label: 'Universitario en curso'},
   {value: 'GRADUATE', label: 'Egresado'},
-  {value: 'BACHELOR', label: 'Bachillerato'},
-  {value: 'LICENSE', label: 'Licenciatura'},
-  {value: 'MASTER', label: 'Maestria'},
+  {value: 'BACHELOR', label: 'Bachiller'},
+  {value: 'LICENSE', label: 'Titulado / Licenciatura'},
+  {value: 'SPECIALIZATION', label: 'Especialización'},
+  {value: 'MASTER', label: 'Maestría'},
   {value: 'PHD', label: 'Doctorado'},
   {value: 'POSTDOC', label: 'Postdoctorado'},
 ];
@@ -90,4 +89,42 @@ export const LANGUAGES = [
   {value: 'ZH', label: 'Chino'},
   {value: 'JA', label: 'Japonés'},
   {value: 'RU', label: 'Ruso'}
+];
+
+export const KNOWLEDGE_AREAS: {
+  value: string;
+  label: string;
+}[] = [
+  {
+    value: 'ARTIFICIAL_INTELLIGENCE',
+    label: 'Inteligencia Artificial (ML, Deep Learning, NLP, Computer Vision)'
+  },
+  {
+    value: 'DATA_SCIENCE_QUANT',
+    label: 'Ciencia de Datos & Quantitative Finance (Analytics, Econometrics, FinTech)'
+  },
+  {
+    value: 'INNOVATION_ENTREPRENEURSHIP',
+    label: 'Innovación & Emprendimiento (Startups, Venture Building, Product Strategy)'
+  },
+  {
+    value: 'PUBLIC_POLICY',
+    label: 'Políticas Públicas (AI Regulation, Global Affairs, Governance)'
+  },
+  {
+    value: 'SUSTAINABILITY_CLIMATE_TECH',
+    label: 'Sostenibilidad & Economía Circular (Climate Tech, Green Innovation)'
+  },
+  {
+    value: 'CREATIVE_TECH',
+    label: 'Creatividad Digital & Multimedia (UX, Design Systems, Branding)'
+  },
+  {
+    value: 'ENGINEERING_SYSTEMS',
+    label: 'Ingeniería, Infraestructura y Sistemas (Industrial, Energía, Supply Chain)'
+  },
+  {
+    value: 'HEALTH_BIOTECH',
+    label: 'Salud, BioTech & Bienestar (HealthTech, Bioinformatics)'
+  }
 ];

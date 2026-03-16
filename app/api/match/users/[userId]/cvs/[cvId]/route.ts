@@ -54,6 +54,10 @@ export async function POST(
       whereClause.deadline = {gte: new Date()};
     }
 
+    if (preferences?.field_of_study) {
+      whereClause.fieldOfStudy = preferences.field_of_study;
+    }
+
     // Filtro de modalidad (solo si se especifica)
     if (preferences?.modality) {
       whereClause.modality = preferences.modality as Modality;
