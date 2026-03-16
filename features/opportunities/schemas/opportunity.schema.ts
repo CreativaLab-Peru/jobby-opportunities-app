@@ -28,6 +28,7 @@ export const opportunitySchema = z.object({
   }).optional(),
   yearSalary: z.coerce.number().optional(),
   deadline: z.date().optional(),
+  isRecurring: z.boolean().optional(),
 });
 
 export type OpportunityFormValues = z.infer<typeof opportunitySchema>;

@@ -19,6 +19,8 @@ import {
 // Shadcn UI
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+
 // Textarea removed: replaced by ReactQuill rich-text editor
 import {Label} from "@/components/ui/label";
 import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
@@ -75,6 +77,7 @@ export default function OpportunityForm({
       fundingAmount: undefined,
       salaryRange: {min: undefined, max: undefined},
       areas: [],
+      isRecurring: false
     }
   });
 
@@ -114,26 +117,10 @@ export default function OpportunityForm({
           max: opportunity.maxSalary ?? undefined,
         },
         yearSalary: opportunity.yearSalary ?? undefined,
+        isRecurring: opportunity.isRecurring || false
       });
     }
   }, [opportunity, reset]);
-
-  // Quill config: toolbar options and allowed formats
-  const quillModules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-      ['blockquote', 'code-block'],
-      ['link'],
-      ['clean']
-    ]
-  };
-
-  const quillFormats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'blockquote', 'code-block', 'link'
-  ];
 
   return (
     <FormProvider {...methods}>
@@ -291,7 +278,7 @@ export default function OpportunityForm({
                 />
               </div>
               <div className="space-y-3">
-                <Label>Habilidades Opcionales</Label>
+                <Label>Etiquetas</Label>
                 <Controller
                   control={control}
                   name="optionalSkills"
@@ -317,7 +304,7 @@ export default function OpportunityForm({
             <CardTitle>Condiciones y Finanzas</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField label="Modalidad" error={errors.modality?.message}>
                 <Controller
                   control={control}
@@ -350,20 +337,45 @@ export default function OpportunityForm({
                 />
               </FormField>
 
-              <FormField label="Fecha Límite" error={errors.deadline?.message}>
+              <div className="flex flex-col gap-4">
+                <FormField label="Fecha Límite" error={errors.deadline?.message}>
+                  <Controller
+                    control={control}
+                    name="deadline"
+                    render={({field}) => (
+                      <DatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Seleccione la fecha límite"
+                        disabled={isSubmitting}
+                      />
+                    )}
+                  />
+                </FormField>
+              </div>
+
+              {/* NUEVO CAMPO CHECKBOX */}
+              <div className="flex items-center space-x-2 pt-2">
                 <Controller
                   control={control}
-                  name="deadline"
-                  render={({field}) => (
-                    <DatePicker
-                      value={field.value} // El valor debe ser un objeto Date
-                      onChange={field.onChange}
-                      placeholder="Seleccione la fecha límite"
-                      disabled={isSubmitting}
+                  name="isRecurring"
+                  render={({ field }) => (
+                    <Checkbox
+                      id="isRecurring"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
                     />
                   )}
                 />
-              </FormField>
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="isRecurring" className="text-sm font-medium cursor-pointer">
+                    Oportunidad Recurrente
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Indica si esta convocatoria se repite anualmente.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="pt-4 border-t grid grid-cols-1 md:grid-cols-4 gap-4 items-end">

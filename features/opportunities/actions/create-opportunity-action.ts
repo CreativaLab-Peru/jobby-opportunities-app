@@ -89,6 +89,7 @@ export async function upsertOpportunityAction(body: OpportunityFormValues, id?: 
 
       deadline: body.deadline ? new Date(body.deadline) : null,
       userId,
+      isRecurring: body.isRecurring,
     };
 
     // 4. Persistencia (Create o Update)

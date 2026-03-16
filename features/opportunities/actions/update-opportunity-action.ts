@@ -90,6 +90,7 @@ export async function updateOpportunityAction(id: string, body: OpportunityFormV
         }),
 
         deadline: body.deadline ? new Date(body.deadline) : null,
+        isRecurring: body.isRecurring,
       }
     });
 
