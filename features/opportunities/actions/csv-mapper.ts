@@ -9,7 +9,9 @@ function parseList(value: unknown): string[] {
 function parseBoolean(value: unknown): boolean | undefined {
   if (value === undefined || value === null || value === '') return undefined;
   const v = String(value).toLowerCase();
-  return ['1', 'true', 'yes'].includes(v);
+  if (['1', 'true', 'yes'].includes(v)) return true;
+  if (['0', 'false', 'no'].includes(v)) return false;
+  return undefined;
 }
 
 function parseNumber(value: unknown): number | undefined {
@@ -20,7 +22,18 @@ function parseNumber(value: unknown): number | undefined {
 
 function parseDate(value: unknown): Date | undefined {
   if (!value) return undefined;
-  const d = new Date(String(value));
+  const str = String(value).trim();
+  // Handle date-only strings (e.g. "YYYY-MM-DD") explicitly to avoid UTC parsing issues
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+  let d: Date;
+  if (dateOnlyMatch) {
+    const year = Number(dateOnlyMatch[1]);
+    const monthIndex = Number(dateOnlyMatch[2]) - 1; // JS months are 0-based
+    const day = Number(dateOnlyMatch[3]);
+    d = new Date(year, monthIndex, day);
+  } else {
+    d = new Date(str);
+  }
   return isNaN(d.getTime()) ? undefined : d;
 }
 

@@ -34,9 +34,11 @@ Cabeceras (orden y descripción)
 19. currency (string) — Optional. Ej: USD
 20. deadline (date) — Optional. `YYYY-MM-DD` o ISO8601
 21. isRecurring (boolean) — Optional. true/false
-22. status (string) — Optional. Enum: ACTIVE, EXPIRED, DRAFT, DELETED
-23. external_id (string) — Optional. Identificador externo para trazabilidad.
-24. notes (string) — Optional. Notas internas.
+22. status (string) — Reservado. Campo actualmente no procesado por el import (el estado se define internamente).
+23. external_id (string) — Reservado. Campo actualmente no procesado por el import.
+24. notes (string) — Reservado. Campo actualmente no procesado por el import.
+    Nota: Los campos `status`, `external_id` y `notes` están reservados para futuras extensiones del import y, en la implementación actual, se ignoran y no afectan al resultado de la importación.
+
 
 Ejemplo de uso
  - Descarga `public/templates/opportunities-template.csv`
