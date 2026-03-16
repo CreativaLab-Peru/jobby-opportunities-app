@@ -21,6 +21,7 @@ export const LEVELS = [
 ];
 
 export const ELEGIBLE_COUNTRIES = [
+  {value: 'LATAM', label: 'LATAM'},
   {value: 'US', label: 'Estados Unidos'},
   {value: 'DE', label: 'Alemania'},
   {value: 'CA', label: 'Canadá'},

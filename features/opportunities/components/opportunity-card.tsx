@@ -140,7 +140,7 @@ export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCa
           </div>
 
           <div className="flex items-center gap-3">
-            {opportunity.minSalary && (
+            {opportunity.minSalary && Number(opportunity.minSalary) > 1 && (
               <div className="text-sm font-semibold text-foreground">
                 {formatCurrency(opportunity.minSalary)}
                 {opportunity.maxSalary && ` - ${formatCurrency(opportunity.maxSalary)}`}
