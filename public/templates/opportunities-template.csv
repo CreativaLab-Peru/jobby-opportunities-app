@@ -1,0 +1,3 @@
+type,title,organization_key,organization_name,organizationLogoUrl,url,description,location,areas,requiredSkills,optionalSkills,eligibleCountries,eligibleLevels,modality,language,minSalary,maxSalary,yearSalary,currency,deadline,isRecurring,status,external_id,notes
+FULL_TIME,"Desarrollador Frontend","acme_inc","Acme Inc","https://acme/logo.png","https://acme/jobs/123","<p>Responsable de desarrollar interfaces con React y Next.js. Experiencia con TypeScript y Prisma.</p>","Lima, PE","software;frontend","react;nextjs;prisma","typescript;graphql","PE;US","JUNIOR;MID",REMOTE,ES,12000,20000,15000,USD,2026-04-30,false,ACTIVE,EXT-1234,"Importado desde plantilla ejemplo"
+

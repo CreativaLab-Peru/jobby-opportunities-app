@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { useSession } from '@/lib/auth-client';
 
+import CsvUploader from '@/components/csv-uploader';
+
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,7 +38,7 @@ export const OpportunitiesScreen = ({
    * Actualiza la URL de forma inmutable.
    * Tipamos las llaves para que coincidan con los parámetros permitidos.
    */
-  const updateQuery = (newParams: Partial<GetOpportunitiesParams> & Record<string, any>) => {
+  const updateQuery = (newParams: Partial<GetOpportunitiesParams> & Record<string, unknown>) => {
     const params = new URLSearchParams(searchParams.toString());
 
     Object.entries(newParams).forEach(([key, value]) => {
@@ -112,6 +114,13 @@ export const OpportunitiesScreen = ({
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
+          <Button asChild>
+            <a href="/templates/opportunities-template.csv" download>
+              Descargar plantilla
+            </a>
+          </Button>
+          <CsvUploader />
+
           <Select
             value={`${filters.sortBy || 'createdAt'}-${filters.sortOrder || 'desc'}`}
             onValueChange={handleSortChange}
@@ -125,7 +134,6 @@ export const OpportunitiesScreen = ({
               <SelectItem value="title-asc">Título A-Z</SelectItem>
             </SelectContent>
           </Select>
-
           <Button asChild>
             <Link href="/opportunities/new">
               <Plus className="mr-2 h-4 w-4" /> Nueva Oportunidad

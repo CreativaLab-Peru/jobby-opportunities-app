@@ -113,13 +113,23 @@ export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCa
             <Globe className="h-3.5 w-3.5" />
             {opportunity.language === 'ES' ? 'Español' : 'Inglés'}
           </div>
-          {opportunity.deadline && (
+          { opportunity.deadline && (
             <div className={cn(
               "flex items-center gap-1.5 font-medium",
-              isExpired ? "text-destructive" : "text-amber-600"
+              isExpired && !opportunity.isRecurring ? "text-destructive" : "text-amber-600"
             )}>
               <Calendar className="h-3.5 w-3.5" />
               Cierra: {format(new Date(opportunity.deadline), "d MMM, yyyy", { locale: es })}
+            </div>
+          )}
+
+          {opportunity.isRecurring && (
+            <div className={cn(
+              "flex items-center gap-1.5 font-medium",
+              "text-emerald-600 text-xs",
+            )}>
+              <Calendar className="h-3.5 w-3.5" />
+              Oportunidad recurrente
             </div>
           )}
         </div>
