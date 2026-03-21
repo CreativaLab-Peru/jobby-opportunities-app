@@ -7,7 +7,7 @@ const sendBatch = async () => {
     let opportunities = [];
 
     try {
-        const raw = fs.readFileSync("./opps.json", "utf8");
+        const raw = fs.readFileSync("./prisma/scripts/opps.json", "utf8");
         opportunities = JSON.parse(raw)?.opportunities;
     } catch (err) {
         console.error("❌ Error leyendo opps.json:", err);

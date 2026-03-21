@@ -7,7 +7,8 @@
     "build": "prisma db push && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:opportunities": "bun prisma/scripts/seed-opportunities.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

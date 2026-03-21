@@ -5,6 +5,14 @@ import {CVAnalysis, MatchRequest} from "@/features/math/types";
 import {Modality, OpportunityType} from "@prisma/client";
 import {MODALITIES, OPPORTUNITY_TYPES} from "@/consts";
 
+const LATAM_COUNTRIES = [
+  "AR", "BO", "BR", "CL", "CO", "CR", "CU", "DO", "EC", "SV", "GT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE", "BZ", "GY", "SR", "HT", "GF"
+];
+
+function normalizeCountryCode(country: string) {
+  return country.trim().toUpperCase();
+}
+
 export async function POST(
   req: NextRequest,
   context: { params: Promise<{ userId: string; cvId: string }> }
@@ -46,16 +54,74 @@ export async function POST(
       );
     }
 
-    // 1. Filtrado inicial en Base de Datos (Eficiencia mejorada)
+
+    // 1. Filtrado inicial en Base de Datos
+    // Reglas clave:
+    // - Si CV no tiene área/nivel/país, solo considerar oportunidades sin ese campo definido.
+    // - Si oportunidad no tiene área/nivel/país, aplica para todos.
     const whereClause: any = {};
+    const andClauses: any[] = [];
+    const cvCountries = (cvData.countries || [])
+      .filter(Boolean)
+      .map(normalizeCountryCode);
+    const cvArea = (cvData.fieldOfStudy || cvData.area || preferences?.field_of_study || "").trim();
 
     // Filtro de fecha (solo si se especifica)
     if (filters?.exclude_expired) {
-      whereClause.deadline = {gte: new Date()};
+      whereClause.deadline = { gte: new Date() };
     }
 
-    if (preferences?.field_of_study) {
-      whereClause.fieldOfStudy = preferences.field_of_study;
+    // Filtro de tipo de oportunidad (MAIN)
+    if (cvData?.type) {
+      whereClause.type = cvData.type as OpportunityType;
+    }
+
+    // Filtro de área/campo de estudio
+    if (cvArea) {
+      andClauses.push({
+        OR: [
+          { fieldOfStudy: cvArea },
+          { fieldOfStudy: null }, // Oportunidades para todas las áreas
+        ],
+      });
+    } else {
+      // Si el CV no tiene área, solo considerar oportunidades sin área
+      andClauses.push({ OR: [{ fieldOfStudy: null }, { fieldOfStudy: "" }] });
+    }
+
+    // Filtro de nivel educativo
+    if (cvData?.level) {
+      andClauses.push({
+        OR: [
+          { eligibleLevels: { has: cvData.level } },
+          { eligibleLevels: { equals: [] } },
+        ],
+      });
+    } else {
+      // Si el CV no tiene nivel, solo considerar oportunidades sin nivel
+      andClauses.push({
+        OR: [
+          { eligibleLevels: { equals: [] } },
+        ],
+      });
+    }
+
+    // Filtro de país
+    if (cvCountries.length > 0) {
+      andClauses.push({
+        OR: [
+          { eligibleCountries: { hasSome: cvCountries } },
+          { eligibleCountries: { has: "LATAM" } },
+          { eligibleCountries: { equals: [] } },
+        ],
+      });
+    } else {
+      // Si el CV no tiene país, solo considerar oportunidades sin país
+      andClauses.push({
+        OR: [
+          { eligibleCountries: { equals: [] } },
+        ],
+      });
     }
 
     // Filtro de modalidad (solo si se especifica)
@@ -63,21 +129,29 @@ export async function POST(
       whereClause.modality = preferences.modality as Modality;
     }
 
-    // Filtro de elegibilidad por ubicación (más flexible)
-    // Ahora acepta matches parciales con OR en lugar de filtro estricto
-    // if (cvData?.location) {
-    //   whereClause.eligibleCountries = {has: cvData.location};
-    // }
-
-    // Filtro por tipo (solo si se especifica)
-    if (cvData?.type) {
-      whereClause.type = cvData.type as OpportunityType;
+    if (andClauses.length > 0) {
+      whereClause.AND = andClauses;
     }
 
     // Búsqueda optimizada con índices
-    const opportunities = await prisma.opportunity.findMany({
+    let opportunities = await prisma.opportunity.findMany({
       where: whereClause,
     });
+
+    // Filtrado adicional para LATAM
+    opportunities = opportunities.filter(opp => {
+      if (opp.eligibleCountries && opp.eligibleCountries.includes("LATAM")) {
+        // Solo considerar usuarios de países LATAM
+        return cvCountries.some(c => LATAM_COUNTRIES.includes(c));
+      }
+      return true;
+    });
+
+    if (process.env.NODE_ENV === 'development') {
+      const latamCount = opportunities.filter(opp => opp.eligibleCountries?.includes("LATAM")).length;
+      console.log(`[MATCHING][LATAM] Oportunidades LATAM tras filtro: ${latamCount}`);
+      console.log(`[MATCHING][TOTAL] Oportunidades tras filtro: ${opportunities.length}`);
+    }
 
     // Logging en desarrollo
     if (process.env.NODE_ENV === 'development') {
@@ -142,26 +216,20 @@ export async function POST(
       })
     );
 
-    // 3. Filtrado de resultados de calidad
-    // Filtrar matches muy bajos (< 30%) a menos que no haya suficientes
-    const qualityThreshold = 0.20;
-    let filteredResults = results.filter(r => r.match_score >= qualityThreshold);
 
-    // Si quedan muy pocos resultados, relajamos el threshold
-    const minResults = preferences?.top_k || 5;
-    if (filteredResults.length < minResults && results.length >= minResults) {
-      // Tomar los mejores N aunque estén bajo el threshold
-      filteredResults = results
-        .sort((a, b) => b.match_score - a.match_score)
-        .slice(0, minResults);
-    }
+    // 3. Filtrado de resultados de calidad (match mínimo 50%)
+    // Objetivo: no devolver becas por debajo del 50%.
+    const qualityThreshold = 0.5;
+    const filteredResults = results.filter(r => r.match_score >= qualityThreshold);
 
     // 4. Ordenar y limitar resultados
+    // Se devuelven los mejores N resultados según el score
     const sortedResults = filteredResults
       .sort((a, b) => b.match_score - a.match_score)
       .slice(0, preferences?.top_k || 5);
 
     // 5. Metadata adicional útil para el frontend
+    // Incluye información de filtros aplicados y promedios para debugging
     const metadata = {
       total_opportunities_evaluated: opportunities.length,
       total_quality_matches: filteredResults.length,
@@ -174,6 +242,9 @@ export async function POST(
         modality: preferences?.modality || 'ANY',
         location: cvData?.location || 'ANY',
         type: cvData?.type || 'ANY',
+        area: cvArea || 'ANY',
+        countries: cvCountries.length > 0 ? cvCountries : ['ANY'],
+        threshold: qualityThreshold,
       }
     };
 
@@ -185,16 +256,18 @@ export async function POST(
     // Full details con info de organización
     const resultsDetails = [];
     for (const match of sortedResults) {
-      // Skill labels
-      const requiredSkillKeys = match.details.requiredSkills;
-      const optionalSkillKeys = match.details.optionalSkills;
+      if (!match.details) continue;
 
-      const requiredSkills = await prisma.skill.findMany({
-        where: {key: {in: requiredSkillKeys}}
-      });
-      const optionalSkills = await prisma.skill.findMany({
-        where: {key: {in: optionalSkillKeys}}
-      });
+      // Skill labels
+      const requiredSkillKeys = match.details.requiredSkills || [];
+      const optionalSkillKeys = match.details.optionalSkills || [];
+
+      const requiredSkills = requiredSkillKeys.length > 0
+        ? await prisma.skill.findMany({ where: {key: {in: requiredSkillKeys}} })
+        : [];
+      const optionalSkills = optionalSkillKeys.length > 0
+        ? await prisma.skill.findMany({ where: {key: {in: optionalSkillKeys}} })
+        : [];
       match.details.requiredSkills = requiredSkills.map(s=> s.name);
       match.details.optionalSkills = optionalSkills.map(s=> s.name);
 
