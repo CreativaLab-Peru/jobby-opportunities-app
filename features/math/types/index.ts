@@ -2,6 +2,8 @@ export interface CVAnalysis {
   summary?: string;       // Resumen generado
   experience_text?: string;
   skills: string[];
+  area?: string;
+  fieldOfStudy?: string;
   level?: 'INTERN' |
     'JUNIOR' |
     'MID' |

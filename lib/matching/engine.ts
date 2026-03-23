@@ -2,6 +2,14 @@ import { cleanText, getEmbedding, cosineSimilarity } from './utils';
 import { Opportunity } from "@prisma/client";
 import { CVAnalysis } from "@/features/math/types";
 
+const LATAM_COUNTRIES = new Set([
+  "AR", "BO", "BR", "CL", "CO", "CR", "CU", "DO", "EC", "SV", "GT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE", "BZ", "GY", "SR", "HT", "GF"
+]);
+
+function normalizeCountry(value: string) {
+  return value.trim().toUpperCase();
+}
+
 /**
  * Scoring de Habilidades con Lógica Difusa
  * Mejora: Escalado suave para no penalizar tanto matches parciales
@@ -50,9 +58,13 @@ function hardRequirementsScore(cv: CVAnalysis, opp: Opportunity): number {
 
   // 1. Elegibilidad por País (Crítico pero no eliminatorio)
   if (opp.eligibleCountries?.length > 0) {
-    const hasCountry = cv.countries?.some(c =>
-      opp.eligibleCountries.includes(c)
-    );
+    const oppCountries = opp.eligibleCountries.map(normalizeCountry);
+    const cvCountries = (cv.countries || []).map(normalizeCountry);
+    const oppHasLatam = oppCountries.includes("LATAM");
+    const cvIsLatam = cvCountries.some(c => LATAM_COUNTRIES.has(c));
+
+    const hasCountry = cvCountries.some(c => oppCountries.includes(c)) || (oppHasLatam && cvIsLatam);
+
     if (!hasCountry) {
       penalties.push(0.15); // Penalización del 15% en lugar de 80%
     }
