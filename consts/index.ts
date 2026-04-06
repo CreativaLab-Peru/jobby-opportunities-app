@@ -54,7 +54,7 @@ export const ELEGIBLE_COUNTRIES = [
   {value: 'HU', label: 'Hungría'},
   {value: 'PL', label: 'Polonia'},
   {value: 'TW', label: 'Taiwán'},
-  {value: 'RO', label: 'Rumania'},
+  {value: 'RO', label: 'Rumanía'},
   {value: 'TH', label: 'Tailandia'}
 ].sort((a, b) => a.label.localeCompare(b.label));
 
