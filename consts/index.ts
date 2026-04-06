@@ -50,7 +50,12 @@ export const ELEGIBLE_COUNTRIES = [
   {value: 'KR', label: 'Corea del Sur'},
   {value: 'IL', label: 'Israel'},
   {value: 'AE', label: 'Emiratos Árabes'},
-  {value: 'CN', label: 'China'}
+  {value: 'CN', label: 'China'},
+  {value: 'HU', label: 'Hungría'},
+  {value: 'PL', label: 'Polonia'},
+  {value: 'TW', label: 'Taiwán'},
+  {value: 'RO', label: 'Rumania'},
+  {value: 'TH', label: 'Tailandia'}
 ].sort((a, b) => a.label.localeCompare(b.label));
 
 
@@ -70,7 +75,15 @@ export const CURRENCIES = [
   {value: 'ARS', label: 'Peso Argentino'},
   {value: 'COP', label: 'Peso Colombiano'},
   {value: 'CLP', label: 'Peso Chileno'},
-  {value: 'PEN', label: 'Sol Peruano'}
+  {value: 'PEN', label: 'Sol Peruano'},
+  {value: 'KRW', label: 'Won Surcoreano'},
+  {value: 'HUF', label: 'Forinto Húngaro'},
+  {value: 'PLN', label: 'Zloty Polaco'},
+  {value: 'TWD', label: 'Nuevo Dólar Taiwanés'},
+  {value: 'RON', label: 'Leu Rumano'},
+  {value: 'SEK', label: 'Corona Sueca'},
+  {value: 'AED', label: 'Dírham Emiratí'},
+  {value: 'THB', label: 'Baht Tailandés'}
 ];
 
 export const MODALITIES = [
@@ -88,7 +101,15 @@ export const LANGUAGES = [
   {value: 'PT', label: 'Portugués'},
   {value: 'ZH', label: 'Chino'},
   {value: 'JA', label: 'Japonés'},
-  {value: 'RU', label: 'Ruso'}
+  {value: 'RU', label: 'Ruso'},
+  {value: 'KO', label: 'Coreano'},
+  {value: 'HI', label: 'Hindi'},
+  {value: 'HU', label: 'Húngaro'},
+  {value: 'PL', label: 'Polaco'},
+  {value: 'RO', label: 'Rumano'},
+  {value: 'SV', label: 'Sueco'},
+  {value: 'AR', label: 'Árabe'},
+  {value: 'TH', label: 'Tailandés'}
 ];
 
 export const KNOWLEDGE_AREAS: {
