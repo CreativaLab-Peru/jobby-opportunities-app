@@ -51,7 +51,10 @@ export async function POST(
 
     // Filtro de fecha (solo si se especifica)
     if (filters?.exclude_expired) {
-      whereClause.deadline = {gte: new Date()};
+      whereClause.OR = [
+        { deadline: { gte: new Date() } }, // Aún no vence
+        { isRecurring: true }              // Es recurrente (se asume válida)
+      ];
     }
 
     if (preferences?.field_of_study) {

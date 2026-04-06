@@ -2,3 +2,6 @@
 
 ## Enhancements
 - Add new currencies, countries and languages to the system.
+
+## Fixes
+- Get recurrent opportunities in the api and the interface

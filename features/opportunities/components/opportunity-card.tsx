@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {OPPORTUNITY_TYPES} from "@/consts";
+import { addYears, isBefore, setYear } from "date-fns";
 
 interface OpportunityCardProps {
   opportunity: Opportunity;
@@ -33,8 +34,27 @@ interface OpportunityCardProps {
   onDelete: (id: string) => void;
 }
 
+const getDisplayDeadline = (deadline: Date | null, isRecurring: boolean) => {
+  if (!deadline) return null;
+
+  let displayDate = new Date(deadline);
+  const now = new Date();
+
+  // Si ya pasó y es recurrente, proyectamos al siguiente año disponible
+  if (isRecurring && isBefore(displayDate, now)) {
+    const currentYear = now.getFullYear();
+    // Ajustamos al año actual o al siguiente si el mes/día ya pasó este año
+    displayDate = setYear(displayDate, currentYear);
+
+    if (isBefore(displayDate, now)) {
+      displayDate = addYears(displayDate, 1);
+    }
+  }
+
+  return displayDate;
+};
+
 export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCardProps) {
-  const isExpired = opportunity.deadline && new Date(opportunity.deadline) < new Date();
 
   // Formateador de moneda
   const formatCurrency = (amount: number) => {
@@ -46,6 +66,13 @@ export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCa
   };
 
   const typeMapped = OPPORTUNITY_TYPES.find(type => type.value === opportunity.type);
+
+  const displayDate = getDisplayDeadline(opportunity.deadline, opportunity.isRecurring);
+
+  // 2. Determinamos si realmente está expirada (solo si NO es recurrente)
+  const isExpired = opportunity.deadline &&
+    new Date(opportunity.deadline) < new Date() &&
+    !opportunity.isRecurring;
 
   return (
     <div className={cn(
@@ -113,13 +140,21 @@ export function OpportunityCard({ opportunity, onEdit, onDelete }: OpportunityCa
             <Globe className="h-3.5 w-3.5" />
             {opportunity.language === 'ES' ? 'Español' : 'Inglés'}
           </div>
-          { opportunity.deadline && (
+          {displayDate && (
             <div className={cn(
               "flex items-center gap-1.5 font-medium",
-              isExpired && !opportunity.isRecurring ? "text-destructive" : "text-amber-600"
+              isExpired ? "text-destructive" : "text-emerald-600"
             )}>
               <Calendar className="h-3.5 w-3.5" />
-              Cierra: {format(new Date(opportunity.deadline), "d MMM, yyyy", { locale: es })}
+              {/* Mostramos la fecha proyectada */}
+              Cierra: {format(displayDate, "d MMM, yyyy", { locale: es })}
+
+              {/* Indicador de que es una proyección */}
+              {opportunity.isRecurring && new Date(opportunity.deadline!) < new Date() && (
+                <Badge variant="secondary" className="text-[9px] h-4 bg-emerald-100 text-emerald-700 border-none">
+                  PRÓXIMA EDICIÓN
+                </Badge>
+              )}
             </div>
           )}
 
