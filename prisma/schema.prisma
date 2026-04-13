@@ -42,6 +42,7 @@ enum OpportunityType {
   FULL_TIME
   PART_TIME
   COMPETITION
+  STARTUP
   OTHER
 }
 
